@@ -19,7 +19,7 @@ def login():
         if username in USER_CREDENTIALS and USER_CREDENTIALS[username] == password:
             session['username'] = username
             flash('Login successful!', 'success')
-            return redirect(url_for('home'))
+            return redirect(url_for('pretraitement'))
         else:
             flash('Invalid username or password. Please try again.', 'danger')
 
@@ -36,7 +36,7 @@ def entrainement():
     return render_template('entrainement.html')
 
 @app.route('/pretraitement', methods=['GET', 'POST'])
-def pretraitament():
+def pretraitement():
 
     return render_template('pretraitament.html')
 

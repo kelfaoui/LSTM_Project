@@ -93,6 +93,32 @@
       .bd-mode-toggle .dropdown-menu .active .bi {
         display: block !important;
       }
+
+
+        .drag-drop-area {
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            background-color: #fff;
+            color: #888;
+        }
+        .btn-browse {
+            background-color: #007bff;
+            color: white;
+            padding: 0.5rem 1rem;
+            margin-top: 1rem;
+        }
+        .switch-group {
+            margin-bottom: 1rem;
+        }
+        .btn-custom {
+            width: 120px;
+            font-weight: bold;
+        }
+        .form-switch .form-check-input {
+            cursor: pointer;
+        }
     </style>
 
     
@@ -231,18 +257,65 @@
 
     <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
       <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <h1 class="h2">Prétraitement</h1>
+        <h1 class="h2">Prétraitement des Données</h1>
         <div class="btn-toolbar mb-2 mb-md-0">
           
         </div>
       </div>
+     
+      <div class="container">
 
-      <!-- Buttons -->
-  <div class="d-flex justify-content-end mt-4">
-    <button class="btn btn-primary btn-custom me-3">BACK</button>
-    <button class="btn btn-success btn-custom">SIMULATE</button>
-</div>
-
+    
+        <!-- Section de téléchargement -->
+        <div class="mb-4">
+            <label class="form-label fw-bold">Sélectionner le fichier :</label>
+            <div class="drag-drop-area">
+                <p><strong>Drag & Drop files here</strong></p>
+                <p>or</p>
+                <button class="btn btn-primary btn-browse">Browse Files</button>
+            </div>
+        </div>
+    
+        <!-- Switches pour filtrer les colonnes -->
+        <div class="mb-5">
+            <label class="form-label fw-bold">Colonnes à filtrer :</label>
+            <div class="row">
+                <!-- Première colonne -->
+                <div class="col-md-6">
+                    <div class="form-switch switch-group">
+                        <input type="checkbox" class="form-check-input" id="id-veh">
+                        <label class="form-check-label" for="id-veh">Id-Veh <span class="text-info" title="Info">&#9432;</span></label>
+                    </div>
+                    <div class="form-switch switch-group">
+                        <input type="checkbox" class="form-check-input" id="local_X">
+                        <label class="form-check-label" for="local_X">Local_X <span class="text-info" title="Info">&#9432;</span></label>
+                    </div>
+                    <div class="form-switch switch-group">
+                        <input type="checkbox" class="form-check-input" id="local_Y">
+                        <label class="form-check-label" for="local_Y">Local_Y <span class="text-info" title="Info">&#9432;</span></label>
+                    </div>
+                </div>
+    
+                <!-- Deuxième colonne -->
+                <div class="col-md-6">
+                    <div class="form-switch switch-group">
+                        <input type="checkbox" class="form-check-input" id="altitude">
+                        <label class="form-check-label" for="altitude">Altitude <span class="text-info" title="Info">&#9432;</span></label>
+                    </div>
+                    <div class="form-switch switch-group">
+                        <input type="checkbox" class="form-check-input" id="longitude">
+                        <label class="form-check-label" for="longitude">Longitude <span class="text-info" title="Info">&#9432;</span></label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+        <!-- Boutons BACK et SIMULATE -->
+        <div class="d-flex justify-content-end">
+            <button class="btn btn-primary btn-custom me-3">BACK</button>
+            <button class="btn btn-success btn-custom">SIMULATE</button>
+        </div>
+    </div>
       
       
     </main>
