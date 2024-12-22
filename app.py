@@ -38,7 +38,7 @@ def entrainement():
 @app.route('/pretraitement', methods=['GET', 'POST'])
 def pretraitement():
 
-    return render_template('pretraitament.html')
+    return render_template('pretraitement.html')
 
 @app.route('/visualisations', methods=['GET', 'POST'])
 def visualisations():
