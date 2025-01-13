@@ -19,7 +19,7 @@ class MainWindow(ctk.CTkToplevel):
 
         self.frame_index = 0
 
-        self.title("MainWindow")
+        self.title("Traffix")
         self.geometry("900x600")
         self.state("zoomed")
 
