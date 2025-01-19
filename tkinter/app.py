@@ -9,6 +9,8 @@ import numpy as np
 from customtkinter import CTkButton, CTkImage
 from tkinter import PhotoImage
 
+from translations import translations
+
 ctk.set_appearance_mode("light")
 ctk.set_default_color_theme("blue")
 
@@ -16,6 +18,8 @@ class MainWindow(ctk.CTkToplevel):
 
     def __init__(self, parent):
         super().__init__(parent)
+        
+        self.parent = parent
 
         self.frame_index = 0
 
@@ -26,6 +30,7 @@ class MainWindow(ctk.CTkToplevel):
         
 
         self.refresh()
+        
     
     def remove_all_frames(self):
         """Remove all frames before refreshing the content."""
@@ -38,10 +43,16 @@ class MainWindow(ctk.CTkToplevel):
         sidebar = ctk.CTkFrame(self, width=200, corner_radius=0, fg_color="#1C3A6B")
         sidebar.pack(fill="y", side="left")
 
-        logo_label = ctk.CTkLabel(sidebar, text="LOGO", text_color="white", font=("Helvetica", 30, "bold"))
-        logo_label.pack(pady=(20, 40))
 
-        menu_items = ["PRÉTRAITEMENT", "ENTRAÎNEMENT", "VISUALISATION DES DONNÉES"]
+        logo_image = Image.open("logo_LSTM.png")
+        logo_icon = ctk.CTkImage(logo_image, size=(150,150))
+        logo_label = ctk.CTkLabel(sidebar, image=logo_icon, text="", fg_color="transparent", bg_color="transparent")
+        logo_label.place(x=20, y=0)
+        logo_label.pack(pady=10)
+        #logo_label = ctk.CTkLabel(sidebar, text="LOGO", text_color="white", font=("Helvetica", 30, "bold"))
+        #logo_label.pack(pady=(20, 40))
+
+        menu_items = [self.parent.translate("preprocessing"), self.parent.translate("training"), self.parent.translate("visualization")]
         idx = 0
         images = [Image.open("edit.png"), Image.open("params.png"), Image.open("visu.png")]
      
@@ -63,40 +74,42 @@ class MainWindow(ctk.CTkToplevel):
         if self.frame_index == 0:
             main_frame = ctk.CTkFrame(self, fg_color="white")
             main_frame.pack(fill="both", expand=True, padx=20, pady=20)
-            title_label = ctk.CTkLabel(main_frame, text="PRÉTRAITEMENT", font=("Helvetica", 28, "bold"))
-            title_label.pack(padx=20, pady=20, anchor="w")
+            title_label = ctk.CTkLabel(main_frame, text=self.parent.translate("preprocessing"), font=("Helvetica", 28, "bold"))
+            title_label.pack(padx=20, pady=20)
+                
+            select_label = ctk.CTkLabel(main_frame, text="Colonnes à filtrer", font=("Helvetica", 20, "bold"))
+            select_label.place(x=50, y=150)
+            columns = ["id-veh", "local_X", "local_Y", "latitude", "longitude"]
+            y_positions = [90, 130, 170, 90, 130]
+            x_positions = [200, 200, 200, 500, 500]
 
-            select_label = ctk.CTkLabel(main_frame, text="sélectionner le fichier :", font=("Helvetica", 14))
-            select_label.place(x=50, y=60)
+            for i, col in enumerate(columns):
+                checkbox = ctk.CTkCheckBox(main_frame, text=col)
+                checkbox.place(x=x_positions[i], y=y_positions[i])
+                    
+            select_label = ctk.CTkLabel(main_frame, text=self.parent.translate("select_file"), font=("Helvetica", 14))
+            select_label.place(x=50, y=260)
 
             drop_frame = ctk.CTkFrame(main_frame, width=500, height=250, border_color="#d3d3d3", border_width=2, fg_color="white")
-            drop_frame.place(x=300, y=60)
+            drop_frame.place(x=300, y=260)
 
-            drag_label = ctk.CTkLabel(drop_frame, text="Glisser déposer les fichiers ici", font=("Helvetica", 14))
+            drag_label = ctk.CTkLabel(drop_frame, text=self.parent.translate("drag_drop"), font=("Helvetica", 14))
             drag_label.pack(expand=True)
 
             browse_button = ctk.CTkButton(drop_frame, text="Browse Files", width=100)
             browse_button.pack(pady=(0, 10))
 
-            columns = ["id-veh", "local_X", "local_Y", "altitude", "longitude"]
-            y_positions = [250, 290, 330, 250, 290]
-            x_positions = [50, 50, 50, 300, 300]
-
-            for i, col in enumerate(columns):
-                checkbox = ctk.CTkCheckBox(main_frame, text=col)
-                checkbox.place(x=x_positions[i], y=y_positions[i])
-
-            back_button = ctk.CTkButton(main_frame, text="BACK", width=100, fg_color="#1C3A6B", command=self.destroy)
+            back_button = ctk.CTkButton(main_frame, text=self.parent.translate("back"), width=100, fg_color="#1C3A6B", command=self.return_to_launcher)
             back_button.place(x=500, y=400)
 
-            simulate_button = ctk.CTkButton(main_frame, text="SIMULATE", width=100, fg_color="#1C3A6B")
+            simulate_button = ctk.CTkButton(main_frame, text=self.parent.translate("simulate"), width=100, fg_color="#1C3A6B")
             simulate_button.place(x=650, y=400)
 
         elif self.frame_index == 1:
             main_frame = ctk.CTkFrame(self, fg_color="white")
             main_frame.pack(fill="both", expand=True, padx=20, pady=20)
 
-            title_label = ctk.CTkLabel(main_frame, text="ENTRAÎNEMENT", font=("Helvetica", 28, "italic"), text_color="black")
+            title_label = ctk.CTkLabel(main_frame, text=self.parent.translate("training"), font=("Helvetica", 28, "bold"), text_color="black")
             title_label.pack(pady=10)
 
             # Algo Section Titles
@@ -104,10 +117,10 @@ class MainWindow(ctk.CTkToplevel):
             algo_frame.pack(pady=20, expand=True)
 
             algo1_label = ctk.CTkLabel(algo_frame, text="Algo 1", font=("Helvetica", 20, "bold"))
-            algo1_label.grid(row=0, column=0, padx=100, pady=10)
+            algo1_label.grid(row=0, column=0, pady=10)
 
             algo2_label = ctk.CTkLabel(algo_frame, text="Algo 2", font=("Helvetica", 20, "bold"))
-            algo2_label.grid(row=0, column=1, padx=100, pady=10)
+            algo2_label.grid(row=0, column=1, pady=10)
 
             # Checkbox Labels
             algo1_options = [
@@ -123,28 +136,50 @@ class MainWindow(ctk.CTkToplevel):
                 "nombre",
                 "nombre LSTM",
                 "nombre de alpha",
-                "autre",
+                "nombre",
                 "autre",
                 "autre"
             ]
 
             # Create Checkboxes for Algo 1 and Algo 2
             for i, option in enumerate(algo1_options):
-                checkbox = ctk.CTkCheckBox(algo_frame, text=option + " ℹ")
-                checkbox.grid(row=i + 1, column=0, padx=50, pady=10, sticky="w")
+                if "nombre" in option.lower():
+                # Create a text entry for options containing "nombre"
+                    entry_label = ctk.CTkLabel(algo_frame, text=option, font=("Helvetica", 14))
+                    entry_label.grid(row=i + 1, column=0, padx=210, pady=10, sticky="w")
+                    entry = ctk.CTkEntry(algo_frame, width=60)
+                    entry.grid(row=i + 1, column=0, padx=50, pady=10, sticky="w")
+                else:
+                    # Create a checkbox for other options
+                    checkbox = ctk.CTkCheckBox(algo_frame, text=option + " ℹ")
+                    checkbox.grid(row=i + 1, column=0, padx=50, pady=10, sticky="w")
+                
+                #checkbox = ctk.CTkCheckBox(algo_frame, text=option + " ℹ")
+                #checkbox.grid(row=i + 1, column=0, padx=50, pady=10, sticky="w")
 
             for i, option in enumerate(algo2_options):
-                checkbox = ctk.CTkCheckBox(algo_frame, text=option + " ℹ")
-                checkbox.grid(row=i + 1, column=1, padx=50, pady=10, sticky="w")
+                if "nombre" in option.lower():
+                # Create a text entry for options containing "nombre"
+                    entry_label = ctk.CTkLabel(algo_frame, text=option, font=("Helvetica", 14))
+                    entry_label.grid(row=i + 1, column=1, padx=210, pady=10, sticky="w")
+                    entry = ctk.CTkEntry(algo_frame, width=60)
+                    entry.grid(row=i + 1, column=1, padx=50, pady=10, sticky="w")
+                else:
+                    # Create a checkbox for other options
+                    checkbox = ctk.CTkCheckBox(algo_frame, text=option + " ℹ")
+                    checkbox.grid(row=i + 1, column=1, padx=50, pady=10, sticky="w")
+                
+                #checkbox = ctk.CTkCheckBox(algo_frame, text=option + " ℹ")
+                #checkbox.grid(row=i + 1, column=1, padx=50, pady=10, sticky="w")
 
             # Back and Simulate Buttons
             button_frame = ctk.CTkFrame(main_frame, fg_color="transparent")
             button_frame.pack(pady=20)
 
-            back_button = ctk.CTkButton(button_frame, text="BACK", width=100, fg_color="#1C3A6B")
+            back_button = ctk.CTkButton(button_frame, text=self.parent.translate("back"), width=100, fg_color="#1C3A6B", command=self.show_pretraitement)
             back_button.grid(row=0, column=0, padx=20)
 
-            simulate_button = ctk.CTkButton(button_frame, text="SIMULATE", width=100, fg_color="#1C3A6B")
+            simulate_button = ctk.CTkButton(button_frame, text=self.parent.translate("simulate"), width=100, fg_color="#1C3A6B")
             simulate_button.grid(row=0, column=1, padx=20)
         else:
             x = np.linspace(0, 60, 100)
@@ -154,7 +189,7 @@ class MainWindow(ctk.CTkToplevel):
             predicted_longitude = -97 + np.cos(x / 10) * 0.5 + np.random.normal(0, 0.05, len(x))
             main_frame = ctk.CTkFrame(self, fg_color="white")
             main_frame.pack(fill="both", expand=True, padx=20, pady=20)
-            title_label = ctk.CTkLabel(main_frame, text="ENTRAÎNEMENT", font=("Helvetica", 28, "italic"), text_color="black")
+            title_label = ctk.CTkLabel(main_frame, text=self.parent.translate("training"), font=("Helvetica", 28, "italic"), text_color="black")
 
 
             fig = Figure(figsize=(6, 4), dpi=100)
@@ -179,10 +214,10 @@ class MainWindow(ctk.CTkToplevel):
             button_frame = ctk.CTkFrame(main_frame)
             button_frame.pack(pady=10)
 
-            back_button = ctk.CTkButton(button_frame, text="BACK")
+            back_button = ctk.CTkButton(button_frame, text=self.parent.translate("back"), command=self.show_training)
             back_button.pack(side="left", padx=10)
 
-            simulate_button = ctk.CTkButton(button_frame, text="SIMULATE")
+            simulate_button = ctk.CTkButton(button_frame, text=self.parent.translate("simulate"))
             simulate_button.pack(side="right", padx=10)
         
     def show_pretraitement(self):
@@ -196,25 +231,37 @@ class MainWindow(ctk.CTkToplevel):
     def show_visualizations(self):
         self.frame_index = 2
         self.refresh()
+        
+    def return_to_launcher(self):
+        self.destroy()  
+        self.master.deiconify()
 
 
 
 class Launcher(ctk.CTk):
     def __init__(self):
         super().__init__()
+        
+        self.language = "fr"
 
         self.title("Launcher")
         self.geometry("700x500")
         self.resizable(False, False)
 
-        logo_label = ctk.CTkLabel(self, text="LOGO", font=("Helvetica", 20, "italic"), text_color="gray")
-        logo_label.place(x=20, y=20)
+        logo_image = Image.open("logo_LSTM.png")
+        self.logo_icon = ctk.CTkImage(logo_image, size=(150,150))
+        logo_label = ctk.CTkLabel(self, image=self.logo_icon, text="", fg_color="transparent", bg_color="transparent")
+        logo_label.place(x=20, y=0)
+        #logo_label = ctk.CTkLabel(self, text="LOGO", font=("Helvetica", 20, "italic"), text_color="gray")
+        #logo_label.place(x=20, y=20)
 
-        title_label = ctk.CTkLabel(self, text="Prédiction de la congestion routière", font=("Helvetica", 32, "bold"))
-        title_label.pack(pady=80)
+        #title_label = ctk.CTkLabel(self, text="Prédiction de la congestion routière", font=("Helvetica", 32, "bold"))
+        #title_label.pack(pady=80)
+        self.title_label = ctk.CTkLabel(self, text=self.translate("title"), font=("Helvetica", 32, "bold"))
+        self.title_label.pack(pady=(150,80))
 
-        start_button = ctk.CTkButton(self, text="START", width=100, height=40, fg_color="#1C3A6B", font=("Helvetica", 18), command=self.open_main_window)
-        start_button.pack(pady=20)
+        self.start_button = ctk.CTkButton(self, text=self.translate("start"), width=100, height=40, fg_color="#1C3A6B", font=("Helvetica", 18), command=self.open_main_window)
+        self.start_button.pack(pady=20)
 
         lang_frame = ctk.CTkFrame(self, fg_color="transparent")
         lang_frame.pack(pady=20)
@@ -225,18 +272,28 @@ class Launcher(ctk.CTk):
         en_image = Image.open("uk_flag.png").resize((50, 50))
         en_icon = ImageTk.PhotoImage(en_image)
 
-        self.fr_button = ctk.CTkButton(lang_frame, image=fr_icon, text="FRANÇAIS", compound="top", width=80, height=80)
+        self.fr_button = ctk.CTkButton(lang_frame, image=fr_icon, text="FRANÇAIS", compound="top", width=80, height=80, command=lambda: self.set_language("fr"))
         self.fr_button.grid(row=0, column=0, padx=20)
 
-        self.en_button = ctk.CTkButton(lang_frame, image=en_icon, text="ENGLISH", compound="top", width=80, height=80)
+        self.en_button = ctk.CTkButton(lang_frame, image=en_icon, text="ENGLISH", compound="top", width=80, height=80, command=lambda: self.set_language("en"))
         self.en_button.grid(row=0, column=1, padx=20)
 
         self.fr_icon = fr_icon
         self.en_icon = en_icon
 
     def open_main_window(self):
-        MainWindow(self)
+        self.mainwindow = MainWindow(self)
         self.withdraw()
+        
+    def translate(self, key):
+        return translations[self.language].get(key, key)
+    
+    def set_language(self, lang):
+        self.language = lang
+        self.title_label.configure(text=self.translate("title"))
+        self.start_button.configure(text=self.translate("start"))
+       
+        
 
 
 if __name__ == "__main__":

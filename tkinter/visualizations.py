@@ -1,6 +1,6 @@
 import customtkinter as ctk
-from matplotlib.figure import Figure
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+#from matplotlib.figure import Figure
+#from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import numpy as np
 
 x = np.linspace(0, 60, 100)
