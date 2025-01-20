@@ -78,20 +78,20 @@ class MainWindow(ctk.CTkToplevel):
             title_label.pack(padx=20, pady=20)
                 
             select_label = ctk.CTkLabel(main_frame, text="Colonnes à filtrer", font=("Helvetica", 20, "bold"))
-            select_label.place(x=50, y=150)
+            select_label.place(x=50, y=50)
             columns = ["id-veh", "local_X", "local_Y", "latitude", "longitude"]
-            y_positions = [90, 130, 170, 90, 130]
-            x_positions = [200, 200, 200, 500, 500]
+            y_positions = [110, 150, 190, 110, 150]
+            x_positions = [100, 100, 100, 400, 400]
 
             for i, col in enumerate(columns):
                 checkbox = ctk.CTkCheckBox(main_frame, text=col)
                 checkbox.place(x=x_positions[i], y=y_positions[i])
                     
-            select_label = ctk.CTkLabel(main_frame, text=self.parent.translate("select_file"), font=("Helvetica", 14))
+            select_label = ctk.CTkLabel(main_frame, text=self.parent.translate("select_file"), font=("Helvetica", 20, "bold"))
             select_label.place(x=50, y=260)
 
             drop_frame = ctk.CTkFrame(main_frame, width=500, height=250, border_color="#d3d3d3", border_width=2, fg_color="white")
-            drop_frame.place(x=300, y=260)
+            drop_frame.place(x=300, y=320)
 
             drag_label = ctk.CTkLabel(drop_frame, text=self.parent.translate("drag_drop"), font=("Helvetica", 14))
             drag_label.pack(expand=True)
@@ -100,10 +100,10 @@ class MainWindow(ctk.CTkToplevel):
             browse_button.pack(pady=(0, 10))
 
             back_button = ctk.CTkButton(main_frame, text=self.parent.translate("back"), width=100, fg_color="#1C3A6B", command=self.return_to_launcher)
-            back_button.place(x=500, y=400)
+            back_button.place(x=650, y=600)
 
-            simulate_button = ctk.CTkButton(main_frame, text=self.parent.translate("simulate"), width=100, fg_color="#1C3A6B")
-            simulate_button.place(x=650, y=400)
+            simulate_button = ctk.CTkButton(main_frame, text=self.parent.translate("simulate"), width=100, fg_color="#1C3A6B", command=self.show_training)
+            simulate_button.place(x=800, y=600)
 
         elif self.frame_index == 1:
             main_frame = ctk.CTkFrame(self, fg_color="white")
@@ -176,11 +176,11 @@ class MainWindow(ctk.CTkToplevel):
             button_frame = ctk.CTkFrame(main_frame, fg_color="transparent")
             button_frame.pack(pady=20)
 
-            back_button = ctk.CTkButton(button_frame, text=self.parent.translate("back"), width=100, fg_color="#1C3A6B", command=self.show_pretraitement)
-            back_button.grid(row=0, column=0, padx=20)
+            back_button = ctk.CTkButton(main_frame, text=self.parent.translate("back"), width=100, fg_color="#1C3A6B", command=self.show_pretraitement)
+            back_button.place(x=650, y=600)
 
-            simulate_button = ctk.CTkButton(button_frame, text=self.parent.translate("simulate"), width=100, fg_color="#1C3A6B")
-            simulate_button.grid(row=0, column=1, padx=20)
+            simulate_button = ctk.CTkButton(main_frame, text=self.parent.translate("simulate"), width=100, fg_color="#1C3A6B", command=self.show_visualizations)
+            simulate_button.place(x=800, y=600)
         else:
             x = np.linspace(0, 60, 100)
             true_latitude = 30 + np.sin(x / 10) * 0.5
@@ -192,33 +192,41 @@ class MainWindow(ctk.CTkToplevel):
             title_label = ctk.CTkLabel(main_frame, text=self.parent.translate("training"), font=("Helvetica", 28, "italic"), text_color="black")
 
 
-            fig = Figure(figsize=(6, 4), dpi=100)
-            ax1 = fig.add_subplot(211)
-            ax2 = fig.add_subplot(212)
+            title_label = ctk.CTkLabel(main_frame, text=self.parent.translate("visualization"), font=("Helvetica", 28, "bold"), text_color="black")
+            title_label.pack(pady=10)    
+                    
+            # Création de la figure
+            fig = Figure(figsize=(6, 8), dpi=100)  # Ajuster la hauteur pour permettre de mieux espacer les graphiques
+            ax1 = fig.add_subplot(211)  # Sous-graphique 1 en haut
+            ax2 = fig.add_subplot(212)  # Sous-graphique 2 en bas
 
+            # Configuration du premier graphique
             ax1.plot(x, true_latitude, label="True Latitude", color='blue')
             ax1.plot(x, predicted_latitude, label="Predicted Latitude", color='orange')
             ax1.legend()
             ax1.set_title("True Latitude vs Predicted Latitude")
 
+            # Configuration du second graphique
             ax2.plot(x, true_longitude, label="True Longitude", color='blue')
             ax2.plot(x, predicted_longitude, label="Predicted Longitude", color='orange')
             ax2.legend()
             ax2.set_title("True Longitude vs Predicted Longitude")
 
-
+            # Dessin du graphique dans un widget Tkinter
             canvas = FigureCanvasTkAgg(fig, master=main_frame)
             canvas.draw()
-            canvas.get_tk_widget().pack()
 
-            button_frame = ctk.CTkFrame(main_frame)
-            button_frame.pack(pady=10)
+            # Pack du widget en mode centré
+            canvas.get_tk_widget().pack(expand=True, pady=20)
 
-            back_button = ctk.CTkButton(button_frame, text=self.parent.translate("back"), command=self.show_training)
-            back_button.pack(side="left", padx=10)
+            # button_frame = ctk.CTkFrame(main_frame)
+            # button_frame.pack(pady=10)
 
-            simulate_button = ctk.CTkButton(button_frame, text=self.parent.translate("simulate"))
-            simulate_button.pack(side="right", padx=10)
+            back_button = ctk.CTkButton(main_frame, text=self.parent.translate("back"), width=100, fg_color="#1C3A6B", command=self.show_training)
+            back_button.place(x=650, y=600)
+
+            simulate_button = ctk.CTkButton(main_frame, text=self.parent.translate("simulate"), width=100, fg_color="#1C3A6B")
+            simulate_button.place(x=800, y=600)
         
     def show_pretraitement(self):
         self.frame_index = 0
