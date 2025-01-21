@@ -49,6 +49,7 @@ class MainWindow(ctk.CTkToplevel):
         logo_label = ctk.CTkLabel(sidebar, image=logo_icon, text="", fg_color="transparent", bg_color="transparent")
         logo_label.place(x=20, y=0)
         logo_label.pack(pady=10)
+        
         #logo_label = ctk.CTkLabel(sidebar, text="LOGO", text_color="white", font=("Helvetica", 30, "bold"))
         #logo_label.pack(pady=(20, 40))
 
@@ -70,29 +71,56 @@ class MainWindow(ctk.CTkToplevel):
                 sidebar, text=item, width=200, height=40, anchor="w", corner_radius=10, font=("Helvetica", 16, "bold"), fg_color="#1C3A6B",
                 command=cmd, image=icon,
             )
-            button.pack(pady=(0, 20), padx=10)
+            button.pack(pady=(0, 90), padx=10)
         if self.frame_index == 0:
             main_frame = ctk.CTkFrame(self, fg_color="white")
             main_frame.pack(fill="both", expand=True, padx=20, pady=20)
             title_label = ctk.CTkLabel(main_frame, text=self.parent.translate("preprocessing"), font=("Helvetica", 28, "bold"))
             title_label.pack(padx=20, pady=20)
                 
-            select_label = ctk.CTkLabel(main_frame, text="Colonnes à filtrer", font=("Helvetica", 20, "bold"))
+            select_label = ctk.CTkLabel(main_frame, text=self.parent.translate("Columns to filter"), font=("Helvetica", 20, "bold"))
             select_label.place(x=50, y=50)
             columns = ["id-veh", "local_X", "local_Y", "latitude", "longitude"]
+            infos = [
+                "ID unique du véhicule.",
+                "Position locale X du véhicule.",
+                "Position locale Y du véhicule.",
+                "Latitude GPS du véhicule.",
+                "Longitude GPS du véhicule."
+            ]
             y_positions = [110, 150, 190, 110, 150]
             x_positions = [100, 100, 100, 400, 400]
-
-            for i, col in enumerate(columns):
+            self.info_labels = []
+                
+            for i, (col, info) in enumerate(zip(columns, infos)):
+                # Checkbox
                 checkbox = ctk.CTkCheckBox(main_frame, text=col)
                 checkbox.place(x=x_positions[i], y=y_positions[i])
-                    
-            select_label = ctk.CTkLabel(main_frame, text=self.parent.translate("select_file"), font=("Helvetica", 20, "bold"))
-            select_label.place(x=50, y=260)
 
+                # Icon I
+                info_icon = ctk.CTkLabel(main_frame, text="ℹ", font=("Helvetica", 18, "bold"), text_color="blue", cursor="hand2")
+                info_icon.place(x=x_positions[i] + 100, y=y_positions[i]) 
+
+                # Affichage de l'information 
+                tooltip = ctk.CTkLabel(main_frame, text=info, font=("Helvetica", 12), text_color="black", fg_color="#f0f0f0", padx=5, pady=5, wraplength=200)
+                tooltip.place(x=x_positions[i] + 120, y=y_positions[i], anchor="w")
+                tooltip.lower() 
+
+                self.info_labels.append(tooltip)
+
+                # Gérer les événements de survol
+                def on_enter_tooltip(event, tooltip=tooltip):
+                    tooltip.lift()  # Afficher
+
+                def on_leave_tooltip(event, tooltip=tooltip):
+                    tooltip.lower()  # Cacher 
+
+                info_icon.bind("<Enter>", on_enter_tooltip)
+                info_icon.bind("<Leave>", on_leave_tooltip)
+                    
             drop_frame = ctk.CTkFrame(main_frame, width=500, height=250, border_color="#d3d3d3", border_width=2, fg_color="white")
             drop_frame.place(x=300, y=320)
-
+    
             drag_label = ctk.CTkLabel(drop_frame, text=self.parent.translate("drag_drop"), font=("Helvetica", 14))
             drag_label.pack(expand=True)
 
@@ -121,56 +149,78 @@ class MainWindow(ctk.CTkToplevel):
 
             algo2_label = ctk.CTkLabel(algo_frame, text="Algo 2", font=("Helvetica", 20, "bold"))
             algo2_label.grid(row=0, column=1, pady=10)
-
-            # Checkbox Labels
+    
+                  
             algo1_options = [
-                "nombre",
-                "nombre LSTM",
-                "nombre de alpha",
-                "autre",
-                "autre",
-                "autre"
+                ("nombre", "Le nombre d'unités dans la couche."),
+                ("nombre LSTM", "Le nombre de couches LSTM."),
+                ("nombre de alpha", "Le paramètre alpha pour la régularisation."),
+                ("autre", "Option supplémentaire pour Algo 1."),
+                ("autre", "Option supplémentaire pour Algo 1."),
+                ("autre", "Option supplémentaire pour Algo 1.")
             ]
 
             algo2_options = [
-                "nombre",
-                "nombre LSTM",
-                "nombre de alpha",
-                "nombre",
-                "autre",
-                "autre"
+                ("nombre", "Le nombre d'unités dans la couche."),
+                ("nombre LSTM", "Le nombre de couches LSTM."),
+                ("nombre de alpha", "Le paramètre alpha pour la régularisation."),
+                ("autre", "Option supplémentaire pour Algo 2."),
+                ("autre", "Option supplémentaire pour Algo 2."),
+                ("autre", "Option supplémentaire pour Algo 2.")
             ]
 
-            # Create Checkboxes for Algo 1 and Algo 2
-            for i, option in enumerate(algo1_options):
+            def show_tooltip(event, tooltip, icon):
+                x = icon.winfo_rootx() - self.winfo_rootx() - 890  # Position relative à l'icône
+                y = icon.winfo_rooty() - self.winfo_rooty() - 140
+                tooltip.place(x=x, y=y)
+
+            def hide_tooltip(tooltip):
+                tooltip.place_forget()
+
+            # Widgets for Algo 1
+            for i, (option, info) in enumerate(algo1_options):
                 if "nombre" in option.lower():
-                # Create a text entry for options containing "nombre"
                     entry_label = ctk.CTkLabel(algo_frame, text=option, font=("Helvetica", 14))
-                    entry_label.grid(row=i + 1, column=0, padx=210, pady=10, sticky="w")
-                    entry = ctk.CTkEntry(algo_frame, width=60)
+                    entry_label.grid(row=i + 1, column=0, padx=110, pady=10, sticky="w")
+                    entry = ctk.CTkEntry(algo_frame, width=50)
                     entry.grid(row=i + 1, column=0, padx=50, pady=10, sticky="w")
                 else:
-                    # Create a checkbox for other options
-                    checkbox = ctk.CTkCheckBox(algo_frame, text=option + " ℹ")
+                    checkbox = ctk.CTkCheckBox(algo_frame, text=option)
                     checkbox.grid(row=i + 1, column=0, padx=50, pady=10, sticky="w")
-                
-                #checkbox = ctk.CTkCheckBox(algo_frame, text=option + " ℹ")
-                #checkbox.grid(row=i + 1, column=0, padx=50, pady=10, sticky="w")
 
-            for i, option in enumerate(algo2_options):
+                # Add info icon
+                info_icon = ctk.CTkLabel(algo_frame, text="ℹ", font=("Helvetica", 18, "bold"), text_color="blue", cursor="hand2")
+                info_icon.grid(row=i + 1, column=0, padx=(250 if "nombre" in option.lower() else 150, 0), pady=10, sticky="w")
+
+                # Tooltip for info icon
+                tooltip = ctk.CTkLabel(main_frame, text=info, font=("Helvetica", 12), text_color="black", fg_color="#f0f0f0", padx=5, pady=5, wraplength=200)
+                tooltip.place_forget()  # Initially hidden
+
+                info_icon.bind("<Enter>", lambda e, t=tooltip, i=info_icon: show_tooltip(e, t, i))
+                info_icon.bind("<Leave>", lambda e, t=tooltip: hide_tooltip(t))
+
+            # Widgets for Algo 2
+            for i, (option, info) in enumerate(algo2_options):
                 if "nombre" in option.lower():
-                # Create a text entry for options containing "nombre"
                     entry_label = ctk.CTkLabel(algo_frame, text=option, font=("Helvetica", 14))
-                    entry_label.grid(row=i + 1, column=1, padx=210, pady=10, sticky="w")
-                    entry = ctk.CTkEntry(algo_frame, width=60)
+                    entry_label.grid(row=i + 1, column=1, padx=110, pady=10, sticky="w")
+                    entry = ctk.CTkEntry(algo_frame, width=50)
                     entry.grid(row=i + 1, column=1, padx=50, pady=10, sticky="w")
                 else:
-                    # Create a checkbox for other options
-                    checkbox = ctk.CTkCheckBox(algo_frame, text=option + " ℹ")
+                    checkbox = ctk.CTkCheckBox(algo_frame, text=option)
                     checkbox.grid(row=i + 1, column=1, padx=50, pady=10, sticky="w")
-                
-                #checkbox = ctk.CTkCheckBox(algo_frame, text=option + " ℹ")
-                #checkbox.grid(row=i + 1, column=1, padx=50, pady=10, sticky="w")
+
+              # Add info icon
+                info_icon = ctk.CTkLabel(algo_frame, text="ℹ", font=("Helvetica", 18, "bold"), text_color="blue", cursor="hand2")
+                info_icon.grid(row=i + 1, column=1, padx=(250 if "nombre" in option.lower() else 150, 0), pady=10, sticky="w")
+
+                # Tooltip for info icon
+                tooltip = ctk.CTkLabel(main_frame, text=info, font=("Helvetica", 12), text_color="black", fg_color="#f0f0f0", padx=5, pady=5, wraplength=200)
+                tooltip.place_forget()  # Initially hidden
+
+                info_icon.bind("<Enter>", lambda e, t=tooltip, i=info_icon: show_tooltip(e, t, i))
+                info_icon.bind("<Leave>", lambda e, t=tooltip: hide_tooltip(t))
+      
 
             # Back and Simulate Buttons
             button_frame = ctk.CTkFrame(main_frame, fg_color="transparent")
@@ -307,3 +357,4 @@ class Launcher(ctk.CTk):
 if __name__ == "__main__":
     app = Launcher()
     app.mainloop()
+    
