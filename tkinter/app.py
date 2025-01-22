@@ -5,11 +5,10 @@ import tkinter as tk
 from matplotlib.figure import Figure 
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg 
 import numpy as np
-
 from customtkinter import CTkButton, CTkImage
 from tkinter import PhotoImage
-
 from translations import translations
+
 
 ctk.set_appearance_mode("light")
 ctk.set_default_color_theme("blue")
@@ -126,7 +125,6 @@ class MainWindow(ctk.CTkToplevel):
 
             browse_button = ctk.CTkButton(drop_frame, text="Browse Files", width=100)
             browse_button.pack(pady=(0, 10))
-
             back_button = ctk.CTkButton(main_frame, text=self.parent.translate("back"), width=100, fg_color="#1C3A6B", command=self.return_to_launcher)
             back_button.place(x=650, y=600)
 
@@ -152,7 +150,7 @@ class MainWindow(ctk.CTkToplevel):
     
                   
             algo1_options = [
-                ("nombre", "Le nombre d'unités dans la couche."),
+                ("nombre de couches", "Le nombre d'unités dans la couche."),
                 ("nombre LSTM", "Le nombre de couches LSTM."),
                 ("nombre de alpha", "Le paramètre alpha pour la régularisation."),
                 ("autre", "Option supplémentaire pour Algo 1."),
@@ -161,7 +159,7 @@ class MainWindow(ctk.CTkToplevel):
             ]
 
             algo2_options = [
-                ("nombre", "Le nombre d'unités dans la couche."),
+                ("nombre de couches", "Le nombre d'unités dans la couche."),
                 ("nombre LSTM", "Le nombre de couches LSTM."),
                 ("nombre de alpha", "Le paramètre alpha pour la régularisation."),
                 ("autre", "Option supplémentaire pour Algo 2."),
@@ -170,7 +168,7 @@ class MainWindow(ctk.CTkToplevel):
             ]
 
             def show_tooltip(event, tooltip, icon):
-                x = icon.winfo_rootx() - self.winfo_rootx() - 890  # Position relative à l'icône
+                x = icon.winfo_rootx() - self.winfo_rootx() - 910  # Position relative à l'icône
                 y = icon.winfo_rooty() - self.winfo_rooty() - 140
                 tooltip.place(x=x, y=y)
 
