@@ -1,0 +1,265 @@
+import customtkinter as ctk
+import tkinter as tk
+from customtkinter import CTkImage
+from PIL import Image, ImageTk
+from tkinterdnd2 import DND_FILES
+from tkinter import filedialog
+import os
+from tkinter import messagebox
+
+class Page1:
+    def __init__(self, root, language):
+        self.root = root
+        self.language = language
+        self.columns_dict = {
+            "Algo 1": ["id-veh", "local_X", "local_Y", "latitude", "longitude"],
+            "Algo 2": ["id-veh", "latitude", "longitude"]
+        }
+        self.translations = {
+            "fr": {
+                "preprocessing": "PRÉTRAITEMENT",
+                "choose_algo": "Choisir un algorithme :",
+                "select_columns": "Sélectionner les colonnes :",
+                "drop_file": "Déposez un fichier ici (csv ou gpx)",
+                "simulate": "Simuler",
+                "back": "Retour",
+                "csv_file": "Fichiers CSV",
+                "gpx_file": "Fichiers GPX",
+                "error_title": "Traffix - Erreur",
+                "invalid_file_type": "Type de fichier incorrect, veuillez choisir un fichier .gpx ou .csv",
+                "menu": [
+                    ("PRÉTRAITEMENT", self.open_page1, "edit.png"),
+                    ("ENTRAÎNEMENT", self.open_page2, "params.png"),
+                    ("VISUALISATION DES\nDONNÉES", self.open_page3, "visu.png")
+                ],
+                "infos": {
+                    "Algo 1": [
+                        "ID unique du véhicule.",
+                        "Position locale X du véhicule.",
+                        "Position locale Y du véhicule.",
+                        "Latitude GPS du véhicule.",
+                        "Longitude GPS du véhicule."
+                    ],
+                    "Algo 2": [
+                        "ID unique du véhicule.",
+                        "Latitude GPS du véhicule.",
+                        "Longitude GPS du véhicule."
+                    ]
+                }
+            },
+            "en": {
+                "preprocessing": "PREPROCESSING",
+                "choose_algo": "Choose an algorithm:",
+                "select_columns": "Select columns:",
+                "drop_file": "Drop a file here",
+                "simulate": "Simulate",
+                "back": "Back",
+                "csv_file": "CSV Files",
+                "gpx_file": "GPX Files",
+                "error_title": "Traffix - Error",
+                "invalid_file_type": "Wrong file type, please select a .gpx or .csv file",
+                "menu": [
+                    ("PREPROCESSING", self.open_page1, "edit.png"),
+                    ("TRAINING", self.open_page2, "params.png"),
+                    ("DATA VISUALIZATION", self.open_page3, "visu.png")
+                ],
+                "infos": {
+                    "Algo 1": [
+                        "Unique vehicle ID.",
+                        "Local X position of the vehicle.",
+                        "Local Y position of the vehicle.",
+                        "Vehicle GPS latitude.",
+                        "Vehicle GPS longitude."
+                    ],
+                    "Algo 2": [
+                        "Unique vehicle ID.",
+                        "Vehicle GPS latitude.",
+                        "Vehicle GPS longitude."
+                    ]
+                }
+            }
+        }
+        self.create_sidebar()
+        self.create_main_frame()
+      
+
+    # Barre latérale (Menu de navigation)
+    def create_sidebar(self):
+        sidebar = ctk.CTkFrame(self.root, width=300, corner_radius=0, fg_color="#1C3A6B")
+        sidebar.pack(side="left", fill="y")
+
+        # Logo
+        logo = ctk.CTkImage(light_image=Image.open("logo_LSTM.png"), size=(200, 200))
+        label_logo = ctk.CTkLabel(sidebar, image=logo, text="")
+        label_logo.pack(pady=(10, 20))
+
+        # Boutons de navigation
+        for text, command, icon_path in self.translations[self.language]["menu"]:
+            icon = CTkImage(light_image=Image.open(icon_path), size=(20, 20))
+            button = ctk.CTkButton(
+                sidebar, text=text, width=200, height=40, anchor="w",
+                corner_radius=10, font=("Arial", 16, "bold"), fg_color="#1C3A6B",
+                command=command, image=icon
+            )
+            button.pack(pady=15, padx=10)
+
+    # Contenu principal
+    def create_main_frame(self):
+        main_frame = ctk.CTkFrame(self.root, fg_color="white")
+        main_frame.pack(fill="both", expand=True, padx=20, pady=20)
+
+        # Titre principal
+        title_label = ctk.CTkLabel(main_frame, text=self.translations[self.language]["preprocessing"], font=("Arial", 28, "bold"), text_color="black")
+        title_label.pack(padx=20, pady=20, anchor="center")
+
+        # Sélection de l'algorithme
+        algo_frame = ctk.CTkFrame(main_frame, fg_color="white", width=500)
+        algo_frame.pack(fill="x", padx=20, pady=20)
+        ctk.CTkLabel(algo_frame, text=self.translations[self.language]["choose_algo"], font=("Arial", 16, "bold"), text_color="black").pack(pady=5, side="left")
+
+        self.algo_dropdown = ctk.CTkComboBox(algo_frame, values=list(self.columns_dict.keys()), command=self.update_checkboxes)
+        self.algo_dropdown.pack(padx=(10, 0), pady=5, side="left")
+
+        # Sélection des colonnes
+        ctk.CTkLabel(main_frame, text=self.translations[self.language]["select_columns"], font=("Arial", 16, "bold"), text_color="black").pack(padx=20, pady=5, anchor="w")
+
+        self.checkbox_frame = ctk.CTkFrame(main_frame, fg_color="white")
+        self.checkbox_frame.pack(padx=20, pady=10, anchor="w")
+
+        # Icône info
+        image = Image.open("info.png").resize((15, 15))
+        self.info_image = ImageTk.PhotoImage(image)
+
+        # Initialisation des checkboxes
+        self.update_checkboxes()
+
+        # Drag & Drop
+        self.create_drag_drop(main_frame)
+
+        # Boutons bas de page
+        ctk.CTkButton(main_frame, text=self.translations[self.language]["simulate"], width=100, fg_color="#1C3A6B", command=self.open_page2).place(relx=0.9, rely=0.95, anchor="center")
+        ctk.CTkButton(main_frame, text=self.translations[self.language]["back"], width=100, fg_color="#1C3A6B", command=self.open_main_window).place(relx=0.75, rely=0.95, anchor="center")
+
+    # Mise à jour des checkboxes selon l'algorithme sélectionné
+    def update_checkboxes(self, event=None):
+        for widget in self.checkbox_frame.winfo_children():
+            widget.destroy()
+
+        selected_algo = self.algo_dropdown.get()
+        columns = self.columns_dict.get(selected_algo, [])
+
+        for i, column in enumerate(columns):
+            row, column_index = divmod(i, 2)
+
+            checkbox = ctk.CTkCheckBox(self.checkbox_frame, text=column, onvalue=column, offvalue="", font=("Arial", 12), text_color="black")
+            info_icon = ctk.CTkLabel(self.checkbox_frame, image=self.info_image, text="")
+
+            if column_index == 1:
+                checkbox.grid(row=row, column=column_index+2, pady=5, padx=(200,30), sticky="w")
+                info_icon.grid(row=row, column=column_index+4, padx=5, pady=5, sticky="w")
+            else:
+                checkbox.grid(row=row, column=column_index, pady=5, padx=10, sticky="w")
+                info_icon.grid(row=row, column=column_index+1, padx=5, pady=5, sticky="w")
+            info_icon.bind("<Enter>", lambda e, text=self.translations[self.language]["infos"].get(selected_algo, [])[i]: self.show_tooltip(e, text))
+            info_icon.bind("<Leave>", self.hide_tooltip)
+
+    # Gestion des tooltips
+    def show_tooltip(self, event, text):
+        if not hasattr(self, 'tooltip_window') or not self.tooltip_window.winfo_exists():
+            x, y = event.x_root, event.y_root
+            self.tooltip_window = tk.Toplevel(self.root)
+            self.tooltip_window.wm_overrideredirect(True)
+            self.tooltip_window.wm_geometry(f"+{x+30}+{y-10}")
+
+            label = tk.Label(self.tooltip_window, text=text, background="#f0f0f0")
+            label.pack(padx=10, pady=5)
+
+    def hide_tooltip(self, event):
+        if hasattr(self, 'tooltip_window') and self.tooltip_window.winfo_exists():
+            self.tooltip_window.destroy()
+            del self.tooltip_window
+
+    # Drag & Drop
+    def create_drag_drop(self, main_frame):
+        canvas = tk.Canvas(main_frame, width=320, height=120, bg="white", highlightthickness=0)
+        canvas.pack(pady=20)
+        canvas.create_rectangle(5, 5, 315, 115, outline="black", width=2, dash=(5, 5))
+
+        drop_frame = ctk.CTkFrame(main_frame, fg_color="#E0E0E0", corner_radius=10)
+        drop_frame.configure(width=300, height=100)
+        drop_frame.pack_propagate(False)
+        drop_frame.place(in_=canvas, anchor="center", relx=0.5, rely=0.5)
+
+        # Faire une référence dans la class au label fu cichier desposé
+        self.drop_label = ctk.CTkLabel(
+            drop_frame, 
+            text=self.translations[self.language]["drop_file"], 
+            font=("Arial", 16), 
+            text_color="black"
+        )
+        self.drop_label.pack(expand=True)
+
+        self.drop_label.bind("<Button-1>", self.on_label_click)  # Left mouse button click
+        self.drop_label.configure(cursor="hand2")  # Change cursor on hover
+
+        drop_frame.drop_target_register(DND_FILES)
+        drop_frame.dnd_bind('<<Drop>>', self.on_file_drop)
+    
+    def on_label_click(self, event):
+        # Ajouter un filtre pour ouvrir uniquement les fichiers gpx et csv
+        file_path = filedialog.askopenfilename(
+            title="Select File",
+            filetypes=[
+                (self.translations[self.language]["csv_file"], "*.csv"),
+                (self.translations[self.language]["gpx_file"], "*.gpx")
+            ]
+        )
+        
+        if file_path:
+            self.drop_label.configure(text=file_path)
+
+    # Fonction qui s'execute quand on sauvegarde le fichier
+    def on_file_drop(self, event):
+        print(f"Fichier déposé : {event.data}")
+        files = event.widget.tk.splitlist(event.data)
+        if files:
+            first_file = files[0]
+            # Récupérer l'extension du fichier
+            file_ext = os.path.splitext(first_file)[1].lower()
+            # Tester si l'extension du fichier est de type "GPX" ou "CSV"
+            if file_ext in ('.gpx', '.csv'):
+                self.drop_label.configure(text=first_file)
+            else:
+                self.drop_label.configure(text=self.translations[self.language]["drop_file"])
+                messagebox.showerror(
+                    self.translations[self.language]["error_title"],
+                    self.translations[self.language]["invalid_file_type"]
+                )
+         
+    def open_main_window(self):
+        from main_window import MainWindow
+        self.clear_window()
+        MainWindow(self.root)
+
+    def open_page1(self):
+        from page1 import Page1
+        if not isinstance(self, Page1):
+            self.clear_window()
+            Page1(self.root)
+
+    def open_page2(self):
+        from page2 import Page2
+        if not isinstance(self, Page2):
+            self.clear_window()
+            Page2(self.root, language=self.language)
+
+    def open_page3(self):
+        from page3 import Page3
+        if not isinstance(self, Page3):
+            self.clear_window()
+            Page3(self.root, language=self.language)
+            
+    def clear_window(self):
+        for widget in self.root.winfo_children():
+            widget.destroy()
+
