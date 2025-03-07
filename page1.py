@@ -22,6 +22,7 @@ class Page1:
                 "select_columns": "Sélectionner les colonnes :",
                 "drop_file": "Déposez un fichier ici (csv ou gpx)",
                 "simulate": "Simuler",
+                "next": "Suivant",
                 "back": "Retour",
                 "csv_file": "Fichiers CSV",
                 "gpx_file": "Fichiers GPX",
@@ -54,6 +55,7 @@ class Page1:
                 "drop_file": "Drop a file here",
                 "simulate": "Simulate",
                 "back": "Back",
+                "next": "next",
                 "csv_file": "CSV Files",
                 "gpx_file": "GPX Files",
                 "error_title": "Traffix - Error",
@@ -137,7 +139,7 @@ class Page1:
         self.create_drag_drop(main_frame)
 
         # Boutons bas de page
-        ctk.CTkButton(main_frame, text=self.translations[self.language]["simulate"], width=100, fg_color="#1C3A6B", command=self.open_page2).place(relx=0.9, rely=0.95, anchor="center")
+        ctk.CTkButton(main_frame, text=self.translations[self.language]["next"], width=100, fg_color="#1C3A6B", command=self.open_page2).place(relx=0.9, rely=0.95, anchor="center")
         ctk.CTkButton(main_frame, text=self.translations[self.language]["back"], width=100, fg_color="#1C3A6B", command=self.open_main_window).place(relx=0.75, rely=0.95, anchor="center")
 
     # Mise à jour des checkboxes selon l'algorithme sélectionné

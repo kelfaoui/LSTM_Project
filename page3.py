@@ -61,13 +61,13 @@ class Page3:
         title_label = ctk.CTkLabel(main_frame, text=self.translations[self.language]["visualization_data"], font=("Arial", 28, "bold"), text_color="black")
         title_label.pack(padx=20, pady=20, anchor="center")
         
-        # Bouton simuler
-        button_next = ctk.CTkButton(main_frame, text=self.translations[self.language]["simulate"], width=100, fg_color="#1C3A6B",command=self.open_page3)
-        button_next.place(relx=0.9, rely=0.95, anchor="center")
+        # # Bouton simuler
+        # button_next = ctk.CTkButton(main_frame, text=self.translations[self.language]["simulate"], width=100, fg_color="#1C3A6B",command=self.open_page3)
+        # button_next.place(relx=0.9, rely=0.95, anchor="center")
         
         # Bouton retour
         button_back = ctk.CTkButton(main_frame, text=self.translations[self.language]["back"], width=100, fg_color="#1C3A6B", command=self.open_page2)
-        button_back.place(relx=0.75, rely=0.95, anchor="center")
+        button_back.place(relx=0.9, rely=0.95, anchor="center")
         
 
     def open_main_window(self):
