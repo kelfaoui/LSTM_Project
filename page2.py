@@ -262,7 +262,7 @@ class Page2:
         update_checkboxes()
         
         # Bouton simuler
-        button_next = ctk.CTkButton(main_frame, text=self.translations[self.language]["simulate"], width=100, fg_color="#1C3A6B",command=add_row)
+        button_next = ctk.CTkButton(main_frame, text=self.translations[self.language]["simulate"], width=100, fg_color="#1C3A6B",command=self.open_page3)
         button_next.place(relx=0.9, rely=0.95, anchor="center")
         
         # Bouton retour
