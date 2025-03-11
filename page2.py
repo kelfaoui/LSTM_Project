@@ -1,8 +1,13 @@
+from tkinter import messagebox, ttk
 import customtkinter as ctk
 import tkinter as tk
 from customtkinter import CTkImage
 from PIL import Image, ImageTk
 from PIL import Image
+import csv
+textboxes = {} # Pour sauvegarder les champs de saisie
+labels =  {} # Pour souvegarder les labels
+encoder = "" #
 
 class Page2:
     def __init__(self, root, language):
@@ -17,6 +22,7 @@ class Page2:
          # Dictionnaire de traductions
         self.translations = {
             "fr": {
+                "validate": "Valider",
                 "training": "ENTRAÎNEMENT",
                 "choose_algo": "Choisir un algorithme :",
                 "select_args": "Sélectionner les arguments :",
@@ -37,6 +43,7 @@ class Page2:
                 }
             },
             "en": {
+                "validate": "Validate",
                 "training": "TRAINING",
                 "choose_algo": "Choose an algorithm:",
                 "select_args": "Select arguments:",
@@ -102,16 +109,77 @@ class Page2:
         selection_label = ctk.CTkLabel(main_frame, text=self.translations[self.language]["select_args"], font=("Arial", 16, "bold"), text_color="black")
         selection_label.pack(padx=20, pady=5, anchor="w")
         
-            # CHECHBOX
-            
-        self.checkbox_frame = ctk.CTkFrame(main_frame, fg_color="white")
-        self.checkbox_frame.pack(padx=20, pady=10, anchor="w")
-        
-
+        # CHECHBOX
+        self.checkbox_frame = ctk.CTkFrame(main_frame, fg_color="white", height=20)
+        self.checkbox_frame.pack(padx=20, pady=5, anchor="w")
+    
         image_path = "info.png"  
         image = Image.open(image_path)  
         image = image.resize((15, 15))  
         self.info_image = ImageTk.PhotoImage(image)  
+    # FRAME LISTE (Taille réduite)
+        self.list_frame = ctk.CTkFrame(main_frame, fg_color="white", height=250)  # Réduction de la hauteur
+        self.list_frame.pack(fill="x", padx=20, pady=5)  # Ajustement du padding
+
+        # ListView Columns
+        columns = ["Model", "Encoder Layer/Cells", "Cells", "Epochs", "Batch Size", "Validation Split", "Actions"]
+
+        # Table (Taille réduite)
+        self.table = ctk.CTkFrame(self.list_frame, fg_color="#d1d1d1", height=200)  # Réduction de la hauteur
+        self.table.pack(fill="x", expand=False, padx=5, pady=5)  # Ajustement des marges
+
+        # Header Frame (Barre d'en-tête)
+        header_frame = ctk.CTkFrame(self.table, fg_color="#d1d1d1", height=40)  # Hauteur plus compacte
+        header_frame.pack(fill="x")
+
+        
+        for col in columns:
+            label = ctk.CTkLabel(header_frame, text=col, font=("Arial", 14, "bold"), text_color="black")
+            label.pack(side="left", padx=10, pady=5, expand=True)
+        
+        self.rows = []
+        
+        def save_to_csv():
+            with open("data.csv", "w", newline="") as file:
+                writer = csv.writer(file)
+                writer.writerow(columns[:-1])
+                for row in self.rows:
+                    values = [child.cget("text") for child in row.winfo_children()[:-1]]
+                    writer.writerow(values)
+
+        def add_row():
+            row_frame = ctk.CTkFrame(self.table, fg_color="white")
+            row_frame.pack(fill="x", padx=5, pady=2)
+            vals = []
+            # Récupérer les valeurs des text boxes et des labels
+            vals =[f"{labels[key].cget('text')} : {textboxes[key].get()}" for key in textboxes]
+            vals.insert(0, self.algo_dropdown.get())
+
+            for val in vals:
+                entry = ctk.CTkLabel(row_frame, text=val, font=("Arial", 12), text_color="black")
+                entry.pack(side="left", padx=10, pady=5, expand=True)
+            
+            action_frame = ctk.CTkFrame(row_frame, fg_color="white")
+            action_frame.pack(side="left", padx=10, pady=10)
+            
+            # edit_button = ctk.CTkButton(action_frame, text="Edit", fg_color="#1C3A6B", width=50, command=lambda: edit_row())
+            # edit_button.pack(side="left", padx=5)
+            
+            delete_button = ctk.CTkButton(action_frame, text="Delete", fg_color="#D9534F", width=50, command=lambda: delete_row(row_frame))
+            delete_button.pack(side="left", padx=5)
+            
+            self.rows.append(row_frame)
+            save_to_csv()
+        
+        def edit_row(values):
+            print("Edit button clicked for:", values)
+        
+        def delete_row(row_frame):
+            row_frame.destroy()
+            self.rows.remove(row_frame)
+            save_to_csv()
+        
+        # Insert example data
 
        # Fonction pour afficher un tooltip au survol
         def show_tooltip(event, text):
@@ -127,6 +195,18 @@ class Page2:
                 # Enregistrer la fenêtre tooltip dans un attribut pour pouvoir la gérer
                 self.tooltip_window = tooltip_window
 
+        # Validation des champs de saisie
+        def validate_fields():
+            missing_fields = []
+            for key, entry in textboxes.items():
+                if not entry.get().strip():
+                    missing_fields.append(labels[key].cget("text"))
+
+            if missing_fields:
+                messagebox.showerror("Validation Error", f"Please fill in the following fields: {', '.join(missing_fields)}")
+            else:
+                add_row()
+
         # Fonction pour supprimer le tooltip lorsque la souris quitte l'icône
         def hide_tooltip(event):
             if hasattr(self, 'tooltip_window') and self.tooltip_window.winfo_exists():
@@ -140,8 +220,10 @@ class Page2:
 
             # Récupérer l'algorithme sélectionné
             selected_algo = self.algo_dropdown.get()
+
             print(f"Algorithme sélectionné : {selected_algo}")
             columns = self.columns_dict.get(selected_algo, [])
+        
             # Ajouter les checkboxes pour chaque colonne sur deux colonnes
             for i, column in enumerate(columns):
                 row = i // 2 
@@ -150,7 +232,8 @@ class Page2:
                 entry = self.float_entry()
                 entry_label = ctk.CTkLabel(self.checkbox_frame, text=column, font=("Arial", 12), text_color="black")
                 info_icon = ctk.CTkLabel(self.checkbox_frame, image=self.info_image, text="")
-
+                textboxes[f"Textbox {i+1}"] = entry
+                labels[f"Textbox {i+1}"] = entry_label
                 if column_index == 1:
                     # Placement pour la deuxième colonne
                     entry.grid(row=row, column=column_index+2, pady=5, padx=(100, 10), sticky="w")
@@ -164,14 +247,22 @@ class Page2:
                 # Associer le survol de l'icône à l'affichage du tooltip
                 info_icon.bind("<Enter>", lambda e, text=self.translations[self.language]["infos"].get(selected_algo, [])[i]: show_tooltip(e, text))
                 info_icon.bind("<Leave>", hide_tooltip)
-            
+            # Bouton de validation
+            validate_button = ctk.CTkButton(
+                self.checkbox_frame, 
+                text=self.translations[self.language]["validate"], 
+                command=validate_fields, 
+                fg_color="green", 
+                hover_color="darkgreen"
+            )
+            validate_button.grid(row=len(columns)//2 + 1, column=2, columnspan=4, pady=10)
 
         # Appeler update_checkboxes à chaque changement de sélection de l'algorithme
         self.algo_dropdown.configure(command=update_checkboxes)
         update_checkboxes()
         
         # Bouton simuler
-        button_next = ctk.CTkButton(main_frame, text=self.translations[self.language]["simulate"], width=100, fg_color="#1C3A6B",command=self.open_page3)
+        button_next = ctk.CTkButton(main_frame, text=self.translations[self.language]["simulate"], width=100, fg_color="#1C3A6B",command=add_row)
         button_next.place(relx=0.9, rely=0.95, anchor="center")
         
         # Bouton retour
@@ -226,6 +317,7 @@ class Page2:
             Page2(self.root)
 
     def open_page3(self):
+        
         from page3 import Page3
         if not isinstance(self, Page3):
             self.clear_window()

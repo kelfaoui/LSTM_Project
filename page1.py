@@ -12,13 +12,20 @@ class Page1:
         self.root = root
         self.language = language
         self.columns_dict = {
-            "Algo 1": ["id-veh", "local_X", "local_Y", "latitude", "longitude"],
-            "Algo 2": ["id-veh", "latitude", "longitude"]
+            "CSV": ["id-veh", "local_X", "local_Y", "latitude", "longitude"],
+            "GPX": ["id-veh", "latitude", "longitude"]
         }
+
+        self.file_dict = {
+            "DPX": ["id-veh", "local_X", "local_Y", "latitude", "longitude"],
+            "GPX": ["id-veh", "latitude", "longitude"]
+        }
+
         self.translations = {
             "fr": {
                 "preprocessing": "PRÉTRAITEMENT",
                 "choose_algo": "Choisir un algorithme :",
+                "choose_file": "Choisir un fichier :",
                 "select_columns": "Sélectionner les colonnes :",
                 "drop_file": "Déposez un fichier ici (csv ou gpx)",
                 "simulate": "Simuler",
@@ -34,14 +41,14 @@ class Page1:
                     ("VISUALISATION DES\nDONNÉES", self.open_page3, "visu.png")
                 ],
                 "infos": {
-                    "Algo 1": [
+                    "CSV": [
                         "ID unique du véhicule.",
                         "Position locale X du véhicule.",
                         "Position locale Y du véhicule.",
                         "Latitude GPS du véhicule.",
                         "Longitude GPS du véhicule."
                     ],
-                    "Algo 2": [
+                    "GPX": [
                         "ID unique du véhicule.",
                         "Latitude GPS du véhicule.",
                         "Longitude GPS du véhicule."
@@ -51,6 +58,7 @@ class Page1:
             "en": {
                 "preprocessing": "PREPROCESSING",
                 "choose_algo": "Choose an algorithm:",
+                "choose_file": "Choose a file :",
                 "select_columns": "Select columns:",
                 "drop_file": "Drop a file here",
                 "simulate": "Simulate",
@@ -66,14 +74,14 @@ class Page1:
                     ("DATA VISUALIZATION", self.open_page3, "visu.png")
                 ],
                 "infos": {
-                    "Algo 1": [
+                    "CSV": [
                         "Unique vehicle ID.",
                         "Local X position of the vehicle.",
                         "Local Y position of the vehicle.",
                         "Vehicle GPS latitude.",
                         "Vehicle GPS longitude."
                     ],
-                    "Algo 2": [
+                    "GPX": [
                         "Unique vehicle ID.",
                         "Vehicle GPS latitude.",
                         "Vehicle GPS longitude."
@@ -113,14 +121,18 @@ class Page1:
         # Titre principal
         title_label = ctk.CTkLabel(main_frame, text=self.translations[self.language]["preprocessing"], font=("Arial", 28, "bold"), text_color="black")
         title_label.pack(padx=20, pady=20, anchor="center")
-
+       
         # Sélection de l'algorithme
         algo_frame = ctk.CTkFrame(main_frame, fg_color="white", width=500)
         algo_frame.pack(fill="x", padx=20, pady=20)
-        ctk.CTkLabel(algo_frame, text=self.translations[self.language]["choose_algo"], font=("Arial", 16, "bold"), text_color="black").pack(pady=5, side="left")
+        self.lbl = ctk.CTkLabel(algo_frame, text=self.translations[self.language]["choose_file"], font=("Arial", 16, "bold"), text_color="black").pack(pady=5, side="left")
+        
+
 
         self.algo_dropdown = ctk.CTkComboBox(algo_frame, values=list(self.columns_dict.keys()), command=self.update_checkboxes)
         self.algo_dropdown.pack(padx=(10, 0), pady=5, side="left")
+     
+
 
         # Sélection des colonnes
         ctk.CTkLabel(main_frame, text=self.translations[self.language]["select_columns"], font=("Arial", 16, "bold"), text_color="black").pack(padx=20, pady=5, anchor="w")
@@ -149,7 +161,7 @@ class Page1:
 
         selected_algo = self.algo_dropdown.get()
         columns = self.columns_dict.get(selected_algo, [])
-
+        print(selected_algo)
         for i, column in enumerate(columns):
             row, column_index = divmod(i, 2)
 
