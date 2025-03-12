@@ -12,8 +12,8 @@ class Page1:
         self.root = root
         self.language = language
         self.columns_dict = {
-            "CSV": ["id-veh", "local_X", "local_Y", "latitude", "longitude"],
-            "GPX": ["id-veh", "latitude", "longitude"]
+            "CSV": ["vehicle_id", "timestamp", "speed", "route_id", "trip_id", "latitude", "longitude", "trip_headsign"],
+            "GPX": ["latitude", "longitude", "elevation", "time"]
         }
 
         self.file_dict = {
@@ -43,15 +43,19 @@ class Page1:
                 "infos": {
                     "CSV": [
                         "ID unique du véhicule.",
-                        "Position locale X du véhicule.",
-                        "Position locale Y du véhicule.",
+                        "Date et heure.",
+                        "Vitesse du véhicule.",
+                        "ID de la route.",
+                        "ID du trajet.",
                         "Latitude GPS du véhicule.",
-                        "Longitude GPS du véhicule."
+                        "Longitude GPS du véhicule.",
+                        "Destination du trajet."
                     ],
                     "GPX": [
-                        "ID unique du véhicule.",
-                        "Latitude GPS du véhicule.",
-                        "Longitude GPS du véhicule."
+                        "Latitude GPS du vehicle",
+                        "Longitude GPS du vehicle",
+                        "Altitude du vehicle",
+                        "Temps de la mesure",
                     ]
                 }
             },
@@ -76,15 +80,19 @@ class Page1:
                 "infos": {
                     "CSV": [
                         "Unique vehicle ID.",
-                        "Local X position of the vehicle.",
-                        "Local Y position of the vehicle.",
+                        "Date and hour.",
+                        "Speed of vehicle.",
+                        "Route ID.",
+                        "Trip ID.",
                         "Vehicle GPS latitude.",
-                        "Vehicle GPS longitude."
+                        "Vehicle GPS longitude.",
+                        "Trip destination."
                     ],
                     "GPX": [
-                        "Unique vehicle ID.",
                         "Vehicle GPS latitude.",
-                        "Vehicle GPS longitude."
+                        "Vehicle GPS longitude.",
+                        "Vehicle altitude.",
+                        "Date and hour."
                     ]
                 }
             }
@@ -161,6 +169,7 @@ class Page1:
 
         selected_algo = self.algo_dropdown.get()
         columns = self.columns_dict.get(selected_algo, [])
+
         print(selected_algo)
         for i, column in enumerate(columns):
             row, column_index = divmod(i, 2)
