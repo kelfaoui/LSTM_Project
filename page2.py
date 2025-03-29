@@ -1,3 +1,4 @@
+import os
 from tkinter import messagebox, ttk
 import customtkinter as ctk
 import tkinter as tk
@@ -8,6 +9,7 @@ import csv
 textboxes = {} # Pour sauvegarder les champs de saisie
 labels =  {} # Pour souvegarder les labels
 encoder = "" #
+all_rows = [] # Pour sauvegarder les lignes
 
 class Page2:
     def __init__(self, root, language):
@@ -22,16 +24,23 @@ class Page2:
          # Dictionnaire de traductions
         self.translations = {
             "fr": {
+                "dataset_size": "Taille du dataset (Entre 0 et 1) :",
+                "select_sequence": "Taille des séquences :",
+                "variable_size": "Taille variable :",
+                "fixed_size": "Taille fixe :",
+                "no_data": "Pas de données",
                 "validate": "Valider",
                 "training": "ENTRAÎNEMENT",
                 "choose_algo": "Choisir un algorithme :",
                 "select_args": "Sélectionner les arguments :",
                 "simulate": "Simuler",
+                "simulation_progress": "Progression de la simulation",
                 "back": "Retour",
                 "menu": [
                     ("PRÉTRAITEMENT", self.open_page1, "edit.png"),
                     ("ENTRAÎNEMENT", self.open_page2, "params.png"),
-                    ("VISUALISATION DES\nDONNÉES", self.open_page3, "visu.png")
+                    ("RESULTAT", self.open_page3, "result.png"),
+                    ("VISUALISATION DES\nDONNÉES", self.open_page4, "visu.png")
                 ],
                 "columns": {
                     "Encoder decoder model": ["Nb neurones encodeur", "Nb neurones décodeur", "Nb epochs", "Batch size", "Learning rate"],
@@ -43,16 +52,23 @@ class Page2:
                 }
             },
             "en": {
+                "dataset_size": "Dataset size (0 to 1):",
+                "select_sequence": "Sequences length:",
+                "variable_size": "Variable size:",
+                "fixed_size": "Fixed size:",
+                "no_data": "No data",
                 "validate": "Validate",
                 "training": "TRAINING",
                 "choose_algo": "Choose an algorithm:",
                 "select_args": "Select arguments:",
                 "simulate": "Simulate",
+                "simulation_progress": "Simulation progress",
                 "back": "Back",
                 "menu": [
                     ("PREPROCESSING", self.open_page1, "edit.png"),
                     ("TRAINING", self.open_page2, "params.png"),
-                    ("DATA VISUALIZATION", self.open_page3, "visu.png")
+                    ("RESULT", self.open_page3, "result.png"),
+                    ("DATA VISUALIZATION", self.open_page4, "visu.png")
                 ],
                 "columns": {
                     "Encoder decoder model": ["encoder_lstm_cells", "decoder_lstm_cells", "epochs", "Batch size", "validation_split"],
@@ -96,8 +112,16 @@ class Page2:
         main_frame = ctk.CTkFrame(self.root, fg_color="white")
         main_frame.pack(fill="both", expand=True, padx=20, pady=20)
         # Titre
-        title_label = ctk.CTkLabel(main_frame, text=self.translations[self.language]["training"], font=("Arial", 28, "bold"), text_color="black")
+        title_label = ctk.CTkLabel(main_frame, text=self.translations[self.language]["training"], font=("Arial", 28, "bold"), text_color="#ff5733")
         title_label.pack(padx=20, pady=20, anchor="center")
+
+        # progress_label = ctk.CTkLabel(main_frame,  text=self.translations[self.language]["simulation_progress"], font=("Arial", 12, "bold"), text_color="black")
+        # progress_label.pack(pady=(5, 2))
+        # Bar de progression
+        # self.progress_bar = ttk.Progressbar(main_frame, orient="horizontal", length=400, mode="determinate")
+        # self.progress_bar.pack(fill="x", padx=10, pady=(0, 10))
+        # self.progress_bar["value"] = 50
+
          # Liste déroulante pour choisir l'algorithme
         algo_frame = ctk.CTkFrame(main_frame, fg_color="white", width=500)
         algo_frame.pack(fill="x", padx=20, pady=20)
@@ -116,8 +140,9 @@ class Page2:
         image_path = "info.png"  
         image = Image.open(image_path)  
         image = image.resize((15, 15))  
-        self.info_image = ImageTk.PhotoImage(image)  
-    # FRAME LISTE (Taille réduite)
+        self.info_image = ImageTk.PhotoImage(image) 
+
+         # FRAME LISTE (Taille réduite)
         self.list_frame = ctk.CTkFrame(main_frame, fg_color="white", height=250)  # Réduction de la hauteur
         self.list_frame.pack(fill="x", padx=20, pady=5)  # Ajustement du padding
 
@@ -137,17 +162,82 @@ class Page2:
             label = ctk.CTkLabel(header_frame, text=col, font=("Arial", 14, "bold"), text_color="black")
             label.pack(side="left", padx=10, pady=5, expand=True)
         
+          
         self.rows = []
-        
+
+         # Vérifier si le fichier CSV existe et contient des données
+        file_path = "data.csv"
+        file_exists = os.path.exists(file_path)
+        has_data = False
+
+        self.empty_label = ctk.CTkLabel(main_frame, text=self.translations[self.language]["no_data"], font=("Arial", 14, "bold"), text_color="gray")
+        self.empty_label.pack(pady=20)
+
+        if file_exists: 
+            with open(file_path, "r", newline="") as file:
+                reader = csv.reader(file)
+                data = list(reader)
+                has_data = len(data) > 1  # Vérifier s'il y a des lignes après l'en-tête
+
+        if has_data:
+            if self.empty_label != None:
+                self.empty_label.pack_forget()
+            # Affichage du tableau uniquement si le fichier contient des données
+            if self.list_frame is None :
+                self.list_frame = ctk.CTkFrame(main_frame, fg_color="white", height=250)
+                self.list_frame.pack(fill="x", padx=20, pady=5)
+
+                self.table = ctk.CTkFrame(self.list_frame, fg_color="#d1d1d1", height=200)
+                self.table.pack(fill="x", expand=False, padx=5, pady=5)
+                
+                header_frame = ctk.CTkFrame(self.table, fg_color="#d1d1d1", height=40)
+                header_frame.pack(fill="x")
+
+                columns = ["Model", "Encoder Layer/Cells", "Cells", "Epochs", "Batch Size", "Validation Split", "Actions"]
+
+                for col in columns:
+                    label = ctk.CTkLabel(header_frame, text=col, font=("Arial", 14, "bold"), text_color="black")
+                    label.pack(side="left", padx=10, pady=5, expand=True)
+
+                self.rows = []
+            
+            self.list_frame = ctk.CTkFrame(main_frame, fg_color="white", height=250)
+            self.list_frame.pack(fill="x", padx=20, pady=5)
+            # Lire les données du CSV et les afficher
+            for row_data in data[1:]:  # Ignorer l'en-tête
+                row_frame = ctk.CTkFrame(self.table, fg_color="white")
+                row_frame.pack(fill="x", padx=5, pady=2)
+
+                for val in row_data:
+                    entry = ctk.CTkLabel(row_frame, text=val, font=("Arial", 12), text_color="black")
+                    entry.pack(side="left", padx=10, pady=5, expand=True)
+
+                action_frame = ctk.CTkFrame(row_frame, fg_color="white")
+                action_frame.pack(side="left", padx=10, pady=10)
+
+                delete_button = ctk.CTkButton(action_frame, text="Delete", fg_color="#D9534F", width=50,
+                                            command=lambda rf=row_frame, rd=row_data: delete_row(rf, rd))
+                delete_button.pack(side="left", padx=5)
+
+                self.rows.append({"frame": row_frame, "data": row_data})
+
+        else:
+            # Afficher un message si le fichier est vide
+            self.list_frame.pack_forget()
+     
+
         def save_to_csv():
             with open("data.csv", "w", newline="") as file:
                 writer = csv.writer(file)
                 writer.writerow(columns[:-1])
                 for row in self.rows:
-                    values = [child.cget("text") for child in row.winfo_children()[:-1]]
+                    values = [child.cget("text") for child in row["frame"].winfo_children()[:-1]]
                     writer.writerow(values)
 
         def add_row():
+            if self.empty_label:
+                self.empty_label.pack_forget()
+            self.list_frame.pack(fill="x", padx=20, pady=5)
             row_frame = ctk.CTkFrame(self.table, fg_color="white")
             row_frame.pack(fill="x", padx=5, pady=2)
             vals = []
@@ -155,9 +245,12 @@ class Page2:
             vals =[f"{labels[key].cget('text')} : {textboxes[key].get()}" for key in textboxes]
             vals.insert(0, self.algo_dropdown.get())
 
+            row_data = []
+
             for val in vals:
                 entry = ctk.CTkLabel(row_frame, text=val, font=("Arial", 12), text_color="black")
                 entry.pack(side="left", padx=10, pady=5, expand=True)
+                row_data.append(val)
             
             action_frame = ctk.CTkFrame(row_frame, fg_color="white")
             action_frame.pack(side="left", padx=10, pady=10)
@@ -165,18 +258,21 @@ class Page2:
             # edit_button = ctk.CTkButton(action_frame, text="Edit", fg_color="#1C3A6B", width=50, command=lambda: edit_row())
             # edit_button.pack(side="left", padx=5)
             
-            delete_button = ctk.CTkButton(action_frame, text="Delete", fg_color="#D9534F", width=50, command=lambda: delete_row(row_frame))
+            delete_button = ctk.CTkButton(action_frame, text="Delete", fg_color="#D9534F", width=50, command=lambda: delete_row(row_frame, row_data))
             delete_button.pack(side="left", padx=5)
             
-            self.rows.append(row_frame)
+            self.rows.append({"frame": row_frame, "data": row_data})
+          
+            
             save_to_csv()
         
         def edit_row(values):
             print("Edit button clicked for:", values)
         
-        def delete_row(row_frame):
+        def delete_row(row_frame, row_data):
             row_frame.destroy()
-            self.rows.remove(row_frame)
+            self.rows = [row for row in self.rows if row["data"] != row_data]  
+            
             save_to_csv()
         
         # Insert example data
@@ -255,20 +351,62 @@ class Page2:
                 fg_color="green", 
                 hover_color="darkgreen"
             )
-            validate_button.grid(row=len(columns)//2 + 1, column=2, columnspan=4, pady=10)
+            validate_button.grid(row=len(columns)//2 + 4, column=2, columnspan=4, pady=10)
+
+            size_label = ctk.CTkLabel(self.checkbox_frame, text=self.translations[self.language]["select_sequence"], font=("Arial", 12, "bold"), text_color="black")
+            size_label.grid(row=len(columns)//2 +1, column=0, columnspan=2, pady=(10, 5), padx=10, sticky="w")
+
+            self.variable_size_checkbox = ctk.CTkCheckBox(self.checkbox_frame, text=self.translations[self.language]["variable_size"], text_color="black", command=self.toggle_variable_size)
+            self.variable_size_checkbox.grid(row=len(columns)//2 + 2, column=0, pady=7, padx=10, sticky="w")
+
+            self.fixed_size_checkbox = ctk.CTkCheckBox(self.checkbox_frame, text=self.translations[self.language]["fixed_size"], text_color="black", command=self.toggle_fixed_size)
+            self.fixed_size_checkbox.grid(row=len(columns)//2 + 2, column=1, pady=7, padx=10, sticky="w")
+            self.variable_size_checkbox.select()
+
+            self.variable_size_entry = self.float_entry()
+            self.variable_size_entry.grid(row=len(columns)//2 + 3, column=0, pady=7, padx=10, sticky="w")
+            #self.variable_size_entry.grid_remove()
+
+            self.dataset_size = ctk.CTkCheckBox(self.checkbox_frame, text=self.translations[self.language]["dataset_size"], text_color="black", command=self.toggle_fixed_size)
+            self.dataset_size.grid(row=len(columns)//2 + 2, column=4, pady=7, padx=10, sticky="w")
+
+            self.dataset_size_entry = self.float_entry()
+            self.dataset_size_entry.grid(row=len(columns)//2 + 3, column=4, pady=7, padx=10, sticky="w")
+
+
 
         # Appeler update_checkboxes à chaque changement de sélection de l'algorithme
         self.algo_dropdown.configure(command=update_checkboxes)
         update_checkboxes()
         
+
+
         # Bouton simuler
-        button_next = ctk.CTkButton(main_frame, text=self.translations[self.language]["simulate"], width=100, fg_color="#1C3A6B",command=self.open_page3)
+        button_next = ctk.CTkButton(main_frame, text=self.translations[self.language]["simulate"], width=100, fg_color="#1C3A6B",command=self.simuler_bouton)
         button_next.place(relx=0.9, rely=0.95, anchor="center")
         
         # Bouton retour
         button_back = ctk.CTkButton(main_frame, text=self.translations[self.language]["back"], width=100, fg_color="#1C3A6B", command=self.open_page1)
         button_back.place(relx=0.75, rely=0.95, anchor="center")
     
+
+    def toggle_variable_size(self):
+            if self.variable_size_checkbox.get():
+                self.fixed_size_checkbox.deselect()
+                self.variable_size_entry.grid()
+            else:
+                self.variable_size_entry.grid_remove()
+
+    def toggle_fixed_size(self):
+            if self.fixed_size_checkbox.get():
+                self.variable_size_checkbox.deselect()
+                self.variable_size_entry.grid_remove()
+
+    def update_progress(self, value):
+        # Mise à jour de la barre de progression
+        self.progress_bar["value"] = value
+        self.root.update_idletasks()  # Refresh UI
+
     # Button customisé pour accepter uniquement les nombres
     def float_entry(self):
         def validate_float(new_text):
@@ -317,11 +455,24 @@ class Page2:
             Page2(self.root)
 
     def open_page3(self):
-        
         from page3 import Page3
         if not isinstance(self, Page3):
             self.clear_window()
             Page3(self.root, language=self.language)
+
+    def open_page4(self):
+        from page4 import Page4
+        if not isinstance(self, Page4):
+            self.clear_window()
+            Page4(self.root, language=self.language)
+    
+    def simuler_bouton(self):
+        from loading import Loading
+        global all_rows
+        all_rows = [row["data"] for row in self.rows]
+        self.clear_window()
+        Loading(self.root, language=self.language)
+        
             
     def clear_window(self):
         for widget in self.root.winfo_children():

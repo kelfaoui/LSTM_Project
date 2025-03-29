@@ -7,6 +7,9 @@ from tkinter import filedialog
 import os
 from tkinter import messagebox
 
+selected_algorithm = ""
+name_file = ""
+
 class Page1:
     def __init__(self, root, language):
         self.root = root
@@ -27,6 +30,7 @@ class Page1:
                 "choose_algo": "Choisir un algorithme :",
                 "choose_file": "Choisir un fichier :",
                 "select_columns": "Sélectionner les colonnes :",
+                "select_sequence": "Taille des séquences :",
                 "drop_file": "Déposez un fichier ici (csv ou gpx)",
                 "simulate": "Simuler",
                 "next": "Suivant",
@@ -38,7 +42,8 @@ class Page1:
                 "menu": [
                     ("PRÉTRAITEMENT", self.open_page1, "edit.png"),
                     ("ENTRAÎNEMENT", self.open_page2, "params.png"),
-                    ("VISUALISATION DES\nDONNÉES", self.open_page3, "visu.png")
+                    ("RESULTAT", self.open_page3, "result.png"),
+                    ("VISUALISATION DES\nDONNÉES", self.open_page4, "visu.png")
                 ],
                 "infos": {
                     "CSV": [
@@ -63,7 +68,8 @@ class Page1:
                 "preprocessing": "PREPROCESSING",
                 "choose_algo": "Choose an algorithm:",
                 "choose_file": "Choose a file :",
-                "select_columns": "Select columns:",
+                "select_columns": "Sequences length:",
+                "select_sequence": "Sequences length:",
                 "drop_file": "Drop a file here",
                 "simulate": "Simulate",
                 "back": "Back",
@@ -75,7 +81,8 @@ class Page1:
                 "menu": [
                     ("PREPROCESSING", self.open_page1, "edit.png"),
                     ("TRAINING", self.open_page2, "params.png"),
-                    ("DATA VISUALIZATION", self.open_page3, "visu.png")
+                    ("RESULT", self.open_page3, "result.png"),
+                    ("DATA VISUALIZATION", self.open_page4, "visu.png")
                 ],
                 "infos": {
                     "CSV": [
@@ -121,13 +128,25 @@ class Page1:
             )
             button.pack(pady=15, padx=10)
 
+
+    def toggle_variable_size(self):
+        if self.variable_size_checkbox.get():
+            self.fixed_size_checkbox.deselect()
+            self.variable_size_entry.pack(pady=5)
+        else:
+            self.variable_size_entry.pack_forget()
+
+    def toggle_fixed_size(self):
+        if self.fixed_size_checkbox.get():
+            self.variable_size_checkbox.deselect()
+            self.variable_size_entry.pack_forget()
     # Contenu principal
     def create_main_frame(self):
         main_frame = ctk.CTkFrame(self.root, fg_color="white")
         main_frame.pack(fill="both", expand=True, padx=20, pady=20)
 
         # Titre principal
-        title_label = ctk.CTkLabel(main_frame, text=self.translations[self.language]["preprocessing"], font=("Arial", 28, "bold"), text_color="black")
+        title_label = ctk.CTkLabel(main_frame, text=self.translations[self.language]["preprocessing"], font=("Arial", 28, "bold"), text_color="#ff5733")
         title_label.pack(padx=20, pady=20, anchor="center")
        
         # Sélection de l'algorithme
@@ -158,10 +177,14 @@ class Page1:
         # Drag & Drop
         self.create_drag_drop(main_frame)
 
+       
+
         # Boutons bas de page
         ctk.CTkButton(main_frame, text=self.translations[self.language]["next"], width=100, fg_color="#1C3A6B", command=self.open_page2).place(relx=0.9, rely=0.95, anchor="center")
         ctk.CTkButton(main_frame, text=self.translations[self.language]["back"], width=100, fg_color="#1C3A6B", command=self.open_main_window).place(relx=0.75, rely=0.95, anchor="center")
 
+
+      
     # Mise à jour des checkboxes selon l'algorithme sélectionné
     def update_checkboxes(self, event=None):
         for widget in self.checkbox_frame.winfo_children():
@@ -185,14 +208,40 @@ class Page1:
                 info_icon.grid(row=row, column=column_index+1, padx=5, pady=5, sticky="w")
             info_icon.bind("<Enter>", lambda e, text=self.translations[self.language]["infos"].get(selected_algo, [])[i]: self.show_tooltip(e, text))
             info_icon.bind("<Leave>", self.hide_tooltip)
+        
+      
+        """ size_label = ctk.CTkLabel(self.checkbox_frame, text=self.translations[self.language]["select_sequence"], font=("Arial", 12, "bold"), text_color="black")
+        size_label.grid(row=len(columns)//2, column=0, columnspan=2, pady=(10, 5), padx=10, sticky="w")
 
+        self.variable_size_checkbox = ctk.CTkCheckBox(self.checkbox_frame, text="Taille variable", text_color="black", command=self.toggle_variable_size)
+        self.variable_size_checkbox.grid(row=len(columns)//2 + 1, column=0, pady=7, padx=10, sticky="w")
+
+        self.fixed_size_checkbox = ctk.CTkCheckBox(self.checkbox_frame, text="Taille fixe", text_color="black", command=self.toggle_fixed_size)
+        self.fixed_size_checkbox.grid(row=len(columns)//2 + 1, column=1, pady=7, padx=10, sticky="w")
+
+        self.variable_size_entry = ctk.CTkEntry(self.checkbox_frame)
+        self.variable_size_entry.grid(row=len(columns)//2 + 2, column=0, pady=7, padx=10, sticky="w")
+        self.variable_size_entry.grid_remove() """
+
+    def toggle_variable_size(self):
+        if self.variable_size_checkbox.get():
+            self.fixed_size_checkbox.deselect()
+            self.variable_size_entry.grid()
+        else:
+            self.variable_size_entry.grid_remove()
+
+    def toggle_fixed_size(self):
+        if self.fixed_size_checkbox.get():
+            self.variable_size_checkbox.deselect()
+            self.variable_size_entry.grid_remove()
+   
     # Gestion des tooltips
     def show_tooltip(self, event, text):
         if not hasattr(self, 'tooltip_window') or not self.tooltip_window.winfo_exists():
             x, y = event.x_root, event.y_root
             self.tooltip_window = tk.Toplevel(self.root)
             self.tooltip_window.wm_overrideredirect(True)
-            self.tooltip_window.wm_geometry(f"+{x+30}+{y-10}")
+            self.tooltip_window.wm_geometry(f"+{x+30}+{y-10}") 
 
             label = tk.Label(self.tooltip_window, text=text, background="#f0f0f0")
             label.pack(padx=10, pady=5)
@@ -213,13 +262,20 @@ class Page1:
         drop_frame.pack_propagate(False)
         drop_frame.place(in_=canvas, anchor="center", relx=0.5, rely=0.5)
 
-        # Faire une référence dans la class au label fu cichier desposé
+        image_path = "upload.png" 
+        image = Image.open(image_path)
+        image = image.resize((24, 24))  
+        self.logo_image = ctk.CTkImage(light_image=image, dark_image=image, size=(24, 24))
+
         self.drop_label = ctk.CTkLabel(
             drop_frame, 
             text=self.translations[self.language]["drop_file"], 
-            font=("Arial", 16), 
-            text_color="black"
+            font=("Arial", 14), 
+            text_color="black",
+            image=self.logo_image,  
+            compound="bottom" # Position le text en dessus
         )
+
         self.drop_label.pack(expand=True)
 
         self.drop_label.bind("<Button-1>", self.on_label_click)  # Left mouse button click
@@ -247,11 +303,13 @@ class Page1:
         files = event.widget.tk.splitlist(event.data)
         if files:
             first_file = files[0]
+            file_name = os.path.basename(first_file)
+            print(f"Fichier déposé : {file_name}")
             # Récupérer l'extension du fichier
             file_ext = os.path.splitext(first_file)[1].lower()
             # Tester si l'extension du fichier est de type "GPX" ou "CSV"
             if file_ext in ('.gpx', '.csv'):
-                self.drop_label.configure(text=first_file)
+                self.drop_label.configure(text=first_file) #file_name si on vuet que le nom du fichier
             else:
                 self.drop_label.configure(text=self.translations[self.language]["drop_file"])
                 messagebox.showerror(
@@ -273,6 +331,9 @@ class Page1:
     def open_page2(self):
         from page2 import Page2
         if not isinstance(self, Page2):
+            global selected_algorithm, name_file
+            name_file = os.path.basename(self.drop_label.cget("text"))
+            selected_algorithm = self.algo_dropdown.get()
             self.clear_window()
             Page2(self.root, language=self.language)
 
@@ -281,6 +342,13 @@ class Page1:
         if not isinstance(self, Page3):
             self.clear_window()
             Page3(self.root, language=self.language)
+
+    def open_page4(self):
+        from page4 import Page4
+        if not isinstance(self, Page4):
+            self.clear_window()
+            Page4(self.root, language=self.language)
+
             
     def clear_window(self):
         for widget in self.root.winfo_children():

@@ -10,7 +10,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.pyplot as plt
 import numpy as np
 
-class Page3:
+class Page4:
     def __init__(self, root, language):
         global selected_algorithm
         self.root = root
@@ -73,14 +73,6 @@ class Page3:
         main_frame = ctk.CTkFrame(self.root, fg_color="white")
         main_frame.pack(fill="both", expand=True, padx=20, pady=20)
         
-        # Titre
-        title_label = ctk.CTkLabel(main_frame, text="Resultat", font=("Arial", 28, "bold"), text_color="black")
-        title_label.pack(padx=20, pady=(20, 10), anchor="center")
-        
-        # Sous-titre
-        subtitle_label = ctk.CTkLabel(main_frame, text="RMSE ET les COURBE D’apprentissage", font=("Arial", 18, "italic"), text_color="black")
-        subtitle_label.pack(anchor="center")
-        
         # FRAME DES GRAPHIQUES
         self.graph_frame = ctk.CTkFrame(main_frame, fg_color="white")
         self.graph_frame.pack(pady=10, padx=10, anchor="center")
@@ -88,50 +80,29 @@ class Page3:
         # Ajouter le graphique
         self.create_plot()
         
-        # Types de graphes
-        types_label = ctk.CTkLabel(main_frame, text="Types de graphes :", font=("Arial", 16, "bold"), text_color="black")
-        types_label.pack(anchor="w", padx=20)
-        
-        graph_options = ["graphe par trajectoire", "graphe avec tous les points"]
-        graph_listbox = ctk.CTkComboBox(main_frame, values=graph_options)
-        graph_listbox.pack(padx=20, anchor="w")
-        
-        # BOUTONS
-        button_frame = ctk.CTkFrame(main_frame, fg_color="white")
-        button_frame.pack(pady=20)
-        
-        bouton_afficher = ctk.CTkButton(button_frame, text="afficher le graphe", width=200, fg_color="#1C3A6B", command=self.afficher_graphe)
-        bouton_afficher.pack(side="left", padx=10)
-        
-        bouton_csv = ctk.CTkButton(button_frame, text="telecharger csv", width=200, fg_color="#1C3A6B", command=self.telecharger_csv)
-        bouton_csv.pack(side="left", padx=10)
-        
-        bouton_afficher_csv = ctk.CTkButton(button_frame, text="afficher le graphe + csv", width=200, fg_color="#1C3A6B", command=self.afficher_graphe_csv)
-        bouton_afficher_csv.pack(side="left", padx=10)
-        
         # Bouton retour
         button_back = ctk.CTkButton(main_frame, text=self.translations[self.language]["back"], width=100, fg_color="#1C3A6B", command=self.retour)
         button_back.pack(pady=10, padx=20, anchor="e")
-    
+
     def create_plot(self):
-        self.fig, self.axs = plt.subplots(2, 1, figsize=(6, 4))
-        x = np.linspace(0, 100, 100)
-        y1_true = np.sin(x / 10) + 0.2
-        y1_pred = y1_true + np.random.normal(0, 0.02, len(x))
-        y2_true = np.cos(x / 10) + 0.5
-        y2_pred = y2_true + np.random.normal(0, 0.02, len(x))
+        fig, ax = plt.subplots(figsize=(8, 5))
+        x = np.arange(200)
+        y_actual = np.cumsum(np.random.randn(200)) + 500000
+        y_predicted = y_actual + np.random.normal(0, 50000, size=200)
         
-        self.axs[0].plot(x, y1_true, label="True Latitude")
-        self.axs[0].plot(x, y1_pred, label="Predicted Latitude", linestyle="--")
-        self.axs[0].legend()
+        ax.plot(x, y_actual, label="actual", color='blue', linestyle='-', marker='o', markersize=2)
+        ax.plot(x, y_predicted, label="prediction", color='red', linestyle='-')
+        ax.set_xlabel("Time step", fontsize=14)
+        ax.set_ylabel("Global_active_power", fontsize=14)
+        ax.legend()
+        ax.set_title(self.translations[self.language]["visualization_data"], fontsize=14, fontweight='bold')
         
-        self.axs[1].plot(x, y2_true, label="True Longitude")
-        self.axs[1].plot(x, y2_pred, label="Predicted Longitude", linestyle="--")
-        self.axs[1].legend()
-        
-        self.canvas = FigureCanvasTkAgg(self.fig, master=self.graph_frame)
-        self.canvas.draw()
-        self.canvas.get_tk_widget().pack()
+        canvas = FigureCanvasTkAgg(fig, master=self.graph_frame)
+        canvas.draw()
+        canvas.get_tk_widget().pack()
+    
+    
+    
     
     def afficher_graphe(self):
         print("Afficher le graphe")
