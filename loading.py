@@ -67,8 +67,8 @@ class Loading:
         self.animate()
         
         # Bouton retour
-        button_back = ctk.CTkButton(main_frame, text=self.translations[self.language]["back"] , width=100, fg_color="#1C3A6B", command=self.retour)
-        button_back.pack(pady=10, anchor="e")
+        # button_back = ctk.CTkButton(main_frame, text=self.translations[self.language]["back"] , width=100, fg_color="#1C3A6B", command=self.retour)
+        # button_back.pack(pady=10, anchor="e")
 
     # Barre latérale (Menu de navigation)
     def create_sidebar(self):
