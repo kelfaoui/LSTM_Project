@@ -18,8 +18,9 @@ class Page2:
 
         self.columns_dict = {
             "Encoder decoder model": ["encoder_lstm_cells", "decoder_lstm_cells", "epochs", "batch_size", "validation_split"],
+            "Simple LSTM model": ["lstm_layers", "lstm_cells", "epochs", "batch_size", "validation_split"],
+            "Encoder decoder bidirectional model": ["lstm_layers", "lstm_cells", "epochs", "batch_size", "validation_split"]
 
-            "Simple LSTM model": ["lstm_layers", "lstm_cells", "epochs", "batch_size", "validation_split"]
         }
          # Dictionnaire de traductions
         self.translations = {
@@ -44,11 +45,15 @@ class Page2:
                 ],
                 "columns": {
                     "Encoder decoder model": ["Nb neurones encodeur", "Nb neurones décodeur", "Nb epochs", "Batch size", "Learning rate"],
-                    "Simple LSTM model": ["Nb CONV1D neurones encodeur", "Nb LSTM neurones encodeur", "Nb CONV1D neurones décodeur", "Nb LSTM neurones décodeur", "Nb epochs", "Batch size", "Learning rate"]
+                    "Simple LSTM model": ["Nb CONV1D neurones encodeur", "Nb LSTM neurones encodeur", "Nb CONV1D neurones décodeur", "Nb LSTM neurones décodeur", "Nb epochs", "Batch size", "Learning rate"],
+                    "Encoder decoder bidirectional model": ["Nb neurones encodeur", "Nb neurones décodeur", "Nb epochs", "Batch size", "Learning rate"],
+
                 },
                 "infos": {
                     "Encoder decoder model": ["a faire, par defaut =64", "a faire, par defaut =64", "a faire, par defaut =50", "a faire, par defaut =64", "a faire, par defaut =0.1"],
-                    "Simple LSTM model": ["a faire, par defaut =1", "a faire, par defaut =64", "a faire, par deafut =50", "a faire, par deafaut =64", "a faire, par defaut =0.1"]
+                    "Simple LSTM model": ["a faire, par defaut =1", "a faire, par defaut =64", "a faire, par deafut =50", "a faire, par deafaut =64", "a faire, par defaut =0.1"],
+                    "Encoder decoder bidirectional model": ["a faire, par defaut =64", "a faire, par defaut =64", "a faire, par defaut =50", "a faire, par defaut =64", "a faire, par defaut =0.1"],
+
                 }
             },
             "en": {
@@ -72,11 +77,15 @@ class Page2:
                 ],
                 "columns": {
                     "Encoder decoder model": ["encoder_lstm_cells", "decoder_lstm_cells", "epochs", "Batch size", "validation_split"],
-                    "Simple LSTM model": ["Nb CONV1D encoder neurons", "Nb LSTM encoder neurons", "Nb CONV1D decoder neurons", "Nb LSTM decoder neurons", "Nb epochs", "Batch size", "Learning rate"]
+                    "Simple LSTM model": ["Nb CONV1D encoder neurons", "Nb LSTM encoder neurons", "Nb CONV1D decoder neurons", "Nb LSTM decoder neurons", "Nb epochs", "Batch size", "Learning rate"],
+                    "Encoder decoder bidirectional model": ["encoder_lstm_cells", "decoder_lstm_cells", "epochs", "Batch size", "validation_split"],
+
                 },
                 "infos": {
                     "Encoder decoder model": ["a faire, default =64", "a faire, default =64", "a faire, default =50", "a faire, default =64", "a faire, default =0.1"],
-                    "Simple LSTM model": ["a faire, default =1", "a faire, default =64", "a faire, default =50", "a faire, default =64", "a faire, default =0.1"]
+                    "Simple LSTM model": ["a faire, default =1", "a faire, default =64", "a faire, default =50", "a faire, default =64", "a faire, default =0.1"],
+                    "Encoder decoder bidirectional model": ["a faire, default =64", "a faire, default =64", "a faire, default =50", "a faire, default =64", "a faire, default =0.1"],
+
                 }
             }
         }
@@ -127,7 +136,7 @@ class Page2:
         algo_frame.pack(fill="x", padx=20, pady=20)
         algo_label = ctk.CTkLabel(algo_frame, text=self.translations[self.language]["choose_algo"], font=("Arial", 16, "bold"), text_color="black")
         algo_label.pack(pady=5, side="left")
-        self.algo_dropdown = ctk.CTkComboBox(algo_frame, values=["Encoder decoder model", "Simple LSTM model"], width=175)
+        self.algo_dropdown = ctk.CTkComboBox(algo_frame, values=["Encoder decoder model", "Simple LSTM model", "Encoder decoder bidirectional model"], width=230)
         self.algo_dropdown.pack(padx=(10,0), pady=5, side="left")
         
         selection_label = ctk.CTkLabel(main_frame, text=self.translations[self.language]["select_args"], font=("Arial", 16, "bold"), text_color="black")
@@ -379,7 +388,7 @@ class Page2:
         self.algo_dropdown.configure(command=update_checkboxes)
         update_checkboxes()
         
-
+    
 
         # Bouton simuler
         button_next = ctk.CTkButton(main_frame, text=self.translations[self.language]["simulate"], width=100, fg_color="#1C3A6B",command=self.simuler_bouton)

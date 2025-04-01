@@ -88,33 +88,32 @@ class Page3:
         # Ajouter le graphique
         self.create_plot()
         
-        # Types de graphes
-        types_label = ctk.CTkLabel(main_frame, text="Types de graphes :", font=("Arial", 16, "bold"), text_color="black")
+          # Types de graphes avec taille ajustée
+        types_label = ctk.CTkLabel(main_frame, text="Types de graphes :", font=("Arial", 16, "bold"), text_color="black", width=180)
         types_label.pack(anchor="w", padx=20)
         
         graph_options = ["graphe par trajectoire", "graphe avec tous les points"]
-        graph_listbox = ctk.CTkComboBox(main_frame, values=graph_options)
-        graph_listbox.pack(padx=20, anchor="w")
+        graph_listbox = ctk.CTkComboBox(main_frame, values=graph_options, width=250)
+        graph_listbox.pack(padx=20, anchor="w", pady=10)
         
-        # BOUTONS
+        # BOUTONS déplacés plus bas
         button_frame = ctk.CTkFrame(main_frame, fg_color="white")
-        button_frame.pack(pady=20)
+        button_frame.pack(pady=50)
         
         bouton_afficher = ctk.CTkButton(button_frame, text="afficher le graphe", width=200, fg_color="#1C3A6B", command=self.afficher_graphe)
-        bouton_afficher.pack(side="left", padx=10)
+        bouton_afficher.pack(side="left", padx=20)
         
-        bouton_csv = ctk.CTkButton(button_frame, text="telecharger csv", width=200, fg_color="#1C3A6B", command=self.telecharger_csv)
-        bouton_csv.pack(side="left", padx=10)
+        bouton_csv = ctk.CTkButton(button_frame, text="télécharger csv", width=200, fg_color="#1C3A6B", command=self.telecharger_csv)
+        bouton_csv.pack(side="left", padx=20)
         
         bouton_afficher_csv = ctk.CTkButton(button_frame, text="afficher le graphe + csv", width=200, fg_color="#1C3A6B", command=self.afficher_graphe_csv)
         bouton_afficher_csv.pack(side="left", padx=10)
-        
+
         # Bouton retour
-        button_back = ctk.CTkButton(main_frame, text=self.translations[self.language]["back"], width=100, fg_color="#1C3A6B", command=self.retour)
-        button_back.pack(pady=10, padx=20, anchor="e")
+        ctk.CTkButton(main_frame, text=self.translations[self.language]["back"], width=100, fg_color="#1C3A6B", command=self.open_page2).place(relx=0.9, rely=0.95, anchor="center")
     
     def create_plot(self):
-        self.fig, self.axs = plt.subplots(2, 1, figsize=(6, 4))
+        self.fig, self.axs = plt.subplots(2, 1, figsize=(4, 3))
         x = np.linspace(0, 100, 100)
         y1_true = np.sin(x / 10) + 0.2
         y1_pred = y1_true + np.random.normal(0, 0.02, len(x))

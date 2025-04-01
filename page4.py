@@ -81,8 +81,8 @@ class Page4:
         self.create_plot()
         
         # Bouton retour
-        button_back = ctk.CTkButton(main_frame, text=self.translations[self.language]["back"], width=100, fg_color="#1C3A6B", command=self.retour)
-        button_back.pack(pady=10, padx=20, anchor="e")
+        ctk.CTkButton(main_frame, text=self.translations[self.language]["back"], width=100, fg_color="#1C3A6B", command=self.open_page3).place(relx=0.9, rely=0.95, anchor="center")
+
 
     def create_plot(self):
         fig, ax = plt.subplots(figsize=(8, 5))
