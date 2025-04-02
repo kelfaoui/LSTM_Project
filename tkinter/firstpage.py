@@ -8,7 +8,7 @@ class MainWindow(ctk.CTk):
     def __init__(self):
         super().__init__()
 
-        self.title("MainWindow")
+        self.title("Traffix")
         self.geometry("700x500")
         self.resizable(False, False)
 
