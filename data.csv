@@ -1,1 +1,2 @@
 Model,Encoder Layer/Cells,Cells,Epochs,Batch Size,Validation Split
+Encoder decoder model,encoder_lstm_cells : 4,decoder_lstm_cells : 1,epochs : 1,batch_size : 1,validation_split : 0.1

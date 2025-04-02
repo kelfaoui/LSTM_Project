@@ -285,18 +285,18 @@ class Page1:
         drop_frame.dnd_bind('<<Drop>>', self.on_file_drop)
     
     def on_label_click(self, event):
-        # Ajouter un filtre pour ouvrir uniquement les fichiers gpx et csv
-        file_path = filedialog.askopenfilename(
-            title="Select File",
+        file_paths = filedialog.askopenfilenames(
+            title="Select Files",
             filetypes=[
                 (self.translations[self.language]["csv_file"], "*.csv"),
                 (self.translations[self.language]["gpx_file"], "*.gpx")
             ]
         )
-        
-        if file_path:
-            self.drop_label.configure(text=file_path)
 
+        if file_paths:
+            self.selected_files = list(file_paths)  # Stocker les fichiers sélectionnés
+            print(self.selected_files)
+            self.drop_label.configure(text="; ".join(os.path.basename(fp) for fp in file_paths))  
     # Fonction qui s'execute quand on sauvegarde le fichier
     def on_file_drop(self, event):
         print(f"Fichier déposé : {event.data}")
