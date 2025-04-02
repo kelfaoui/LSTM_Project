@@ -25,7 +25,7 @@ class Page2:
          # Dictionnaire de traductions
         self.translations = {
             "fr": {
-                "dataset_size": "Taille du dataset (Entre 0 et 1) :",
+                "dataset_size": "dataset de l'entrainement (Entre 0 et 1) :",
                 "select_sequence": "Taille des séquences :",
                 "variable_size": "Taille variable :",
                 "fixed_size": "Taille fixe :",
@@ -50,9 +50,9 @@ class Page2:
 
                 },
                 "infos": {
-                    "Encoder decoder model": ["a faire, par defaut =64", "a faire, par defaut =64", "a faire, par defaut =50", "a faire, par defaut =64", "a faire, par defaut =0.1"],
-                    "Simple LSTM model": ["a faire, par defaut =1", "a faire, par defaut =64", "a faire, par deafut =50", "a faire, par deafaut =64", "a faire, par defaut =0.1"],
-                    "Encoder decoder bidirectional model": ["a faire, par defaut =64", "a faire, par defaut =64", "a faire, par defaut =50", "a faire, par defaut =64", "a faire, par defaut =0.1"],
+                    "Encoder decoder model": ["nombre de cellules LSTM de l'encodeur", "nombre de cellules LSTM de decodeur", "nombre de passage sur le dataset", "taille du dataset par couche", "taux d'apprentissage"],
+                    "Simple LSTM model": ["Number of LSTM layers","Number of LSTM cells per layer","Number of epochs","Batch size","Learning rate"],
+                    "Encoder decoder bidirectional model":["nombre de cellules lstm de l'encodeur", "nombre de cellules lstm de decodeur", "nombre de passage sur le dataset", "taille du dataset par couche", "taux d'apprentissage"],
 
                 }
             },
@@ -82,9 +82,9 @@ class Page2:
 
                 },
                 "infos": {
-                    "Encoder decoder model": ["a faire, default =64", "a faire, default =64", "a faire, default =50", "a faire, default =64", "a faire, default =0.1"],
+                    "Encoder decoder model": ["Number of LSTM cells in the encoder", "Number of LSTM cells in the decoder", "Number of passes through the dataset", "Dataset size per layer", "Learning rate"],
                     "Simple LSTM model": ["a faire, default =1", "a faire, default =64", "a faire, default =50", "a faire, default =64", "a faire, default =0.1"],
-                    "Encoder decoder bidirectional model": ["a faire, default =64", "a faire, default =64", "a faire, default =50", "a faire, default =64", "a faire, default =0.1"],
+                    "Encoder decoder bidirectional model": ["Number of LSTM cells in the encoder", "Number of LSTM cells in the decoder", "Number of passes through the dataset", "Dataset size per layer", "Learning rate"],
 
                 }
             }
@@ -123,13 +123,6 @@ class Page2:
         # Titre
         title_label = ctk.CTkLabel(main_frame, text=self.translations[self.language]["training"], font=("Arial", 28, "bold"), text_color="#ff5733")
         title_label.pack(padx=20, pady=20, anchor="center")
-
-        # progress_label = ctk.CTkLabel(main_frame,  text=self.translations[self.language]["simulation_progress"], font=("Arial", 12, "bold"), text_color="black")
-        # progress_label.pack(pady=(5, 2))
-        # Bar de progression
-        # self.progress_bar = ttk.Progressbar(main_frame, orient="horizontal", length=400, mode="determinate")
-        # self.progress_bar.pack(fill="x", padx=10, pady=(0, 10))
-        # self.progress_bar["value"] = 50
 
          # Liste déroulante pour choisir l'algorithme
         algo_frame = ctk.CTkFrame(main_frame, fg_color="white", width=500)

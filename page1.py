@@ -37,6 +37,9 @@ class Page1:
                 "back": "Retour",
                 "csv_file": "Fichiers CSV",
                 "gpx_file": "Fichiers GPX",
+                "You must select at least one column to continue" : "Veuillez sélectionner au moins une colonne avant de continuer",
+                "The selected file must be in GPX or CSV format" : "Le fichier sélectionné doit être au format GPX ou CSV",
+                "Please select a GPX or CSV file before proceeding" :"Veuillez sélectionner un fichier GPX ou CSV avant de continuer",
                 "error_title": "Traffix - Erreur",
                 "invalid_file_type": "Type de fichier incorrect, veuillez choisir un fichier .gpx ou .csv",
                 "menu": [
@@ -76,6 +79,9 @@ class Page1:
                 "next": "next",
                 "csv_file": "CSV Files",
                 "gpx_file": "GPX Files",
+                "The selected file must be in GPX or CSV format" : "The selected file must be in GPX or CSV format",
+                "You must select at least one column to continue": "You must select at least one column to continue",
+                "Please select a GPX or CSV file before proceeding": "Please select a GPX or CSV file before proceeding",
                 "error_title": "Traffix - Error",
                 "invalid_file_type": "Wrong file type, please select a .gpx or .csv file",
                 "menu": [
@@ -339,14 +345,16 @@ class Page1:
             if file_path == self.translations[self.language]["drop_file"] or not file_path:
                 messagebox.showerror(
                     self.translations[self.language]["error_title"],
-                    "Veuillez sélectionner un fichier GPX ou CSV avant de continuer."
+                    self.translations[self.language]["Please select a GPX or CSV file before proceeding"],
+
                 )
                 return
             
             if file_ext not in ('.gpx', '.csv'):
                 messagebox.showerror(
                     self.translations[self.language]["error_title"],
-                    "Le fichier sélectionné doit être au format GPX ou CSV."
+                    self.translations[self.language]["The selected file must be in GPX or CSV format"],
+
                 )
                 return
 
@@ -359,7 +367,8 @@ class Page1:
             if not selected_columns:
                 messagebox.showerror(
                     self.translations[self.language]["error_title"],
-                    "Veuillez sélectionner au moins une colonne avant de continuer."
+                    self.translations[self.language]["You must select at least one column to continue"]
+
                 )
                 return
                       

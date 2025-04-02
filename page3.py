@@ -102,12 +102,15 @@ class Page3:
         
         bouton_afficher = ctk.CTkButton(button_frame, text="afficher le graphe", width=200, fg_color="#1C3A6B", command=self.afficher_graphe)
         bouton_afficher.pack(side="left", padx=20)
-        
+        #bouton_afficher.place(relx=0.75, rely=0.95, anchor="center")
+
         bouton_csv = ctk.CTkButton(button_frame, text="télécharger csv", width=200, fg_color="#1C3A6B", command=self.telecharger_csv)
         bouton_csv.pack(side="left", padx=20)
-        
+        #bouton_csv.place(relx=0.55, rely=0.75, anchor="center")
+
         bouton_afficher_csv = ctk.CTkButton(button_frame, text="afficher le graphe + csv", width=200, fg_color="#1C3A6B", command=self.afficher_graphe_csv)
         bouton_afficher_csv.pack(side="left", padx=10)
+        #bouton_afficher_csv.place(relx=0.75, rely=0.95, anchor="center")
 
         # Bouton retour
         ctk.CTkButton(main_frame, text=self.translations[self.language]["back"], width=100, fg_color="#1C3A6B", command=self.open_page2).place(relx=0.9, rely=0.95, anchor="center")

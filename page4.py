@@ -58,7 +58,6 @@ class Page4:
         label_logo.pack(pady=(10, 20))
 
         # Boutons de navigation
-        
         for text, command, icon_path in self.translations[self.language]["menu"]:
             icon = CTkImage(light_image=Image.open(icon_path), size=(20, 20))
             button = ctk.CTkButton(
@@ -67,22 +66,50 @@ class Page4:
                 command=command, image=icon
             )
             button.pack(pady=15, padx=10)
-
+       
     def create_widgets(self):            
-        # FRAME PRINCIPAL
+        # FRAME PRINCIPAL AVEC SCROLL
         main_frame = ctk.CTkFrame(self.root, fg_color="white")
         main_frame.pack(fill="both", expand=True, padx=20, pady=20)
         
-        # FRAME DES GRAPHIQUES
-        self.graph_frame = ctk.CTkFrame(main_frame, fg_color="white")
-        self.graph_frame.pack(pady=10, padx=10, anchor="center")
+        # Création du système de scroll
+        self.canvas = tk.Canvas(main_frame, bg="white", highlightthickness=0)
+        scrollbar = ctk.CTkScrollbar(main_frame, orientation="vertical", command=self.canvas.yview)
+        scrollable_frame = ctk.CTkFrame(self.canvas, fg_color="white")
         
+        scrollable_frame.bind(
+            "<Configure>",
+            lambda e: self.canvas.configure(
+                scrollregion=self.canvas.bbox("all")
+            )
+        )
+        
+        self.canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+        self.canvas.configure(yscrollcommand=scrollbar.set)
+        
+        self.canvas.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
+        
+        # Titre principal
+        title_label = ctk.CTkLabel(scrollable_frame, 
+                                 text=self.translations[self.language]["visualization_data"], 
+                                 font=("Arial", 28, "bold"), 
+                                 text_color="#ff5733")
+        title_label.pack(padx=20, pady=20, anchor="center")
+        
+        # FRAME DES GRAPHIQUES
+        self.graph_frame = ctk.CTkFrame(scrollable_frame, fg_color="white")
+        self.graph_frame.pack(pady=10, padx=10, anchor="center")
+       
         # Ajouter le graphique
         self.create_plot()
         
-        # Bouton retour
+        # Bouton retour (placé dans la frame scrollable mais fixé en bas)
         ctk.CTkButton(main_frame, text=self.translations[self.language]["back"], width=100, fg_color="#1C3A6B", command=self.open_page3).place(relx=0.9, rely=0.95, anchor="center")
 
+        
+        # Configuration du scroll avec la molette de la souris
+        self.canvas.bind_all("<MouseWheel>", lambda event: self.canvas.yview_scroll(int(-1*(event.delta/120)), "units"))
 
     def create_plot(self):
         fig, ax = plt.subplots(figsize=(8, 5))
@@ -95,14 +122,10 @@ class Page4:
         ax.set_xlabel("Time step", fontsize=14)
         ax.set_ylabel("Global_active_power", fontsize=14)
         ax.legend()
-        ax.set_title(self.translations[self.language]["visualization_data"], fontsize=14, fontweight='bold')
         
         canvas = FigureCanvasTkAgg(fig, master=self.graph_frame)
         canvas.draw()
         canvas.get_tk_widget().pack()
-    
-    
-    
     
     def afficher_graphe(self):
         print("Afficher le graphe")
@@ -122,20 +145,15 @@ class Page4:
         curve_window.geometry("600x400")
 
     def telecharger_csv(self):
-        # Ouvre le gestionnaire de fichier pour choisir où sauvegarder le fichier CSV
         file_path = filedialog.asksaveasfilename(defaultextension=".csv", filetypes=[("Fichiers CSV", "*.csv")])
         
         if file_path:
-            # Sauvegarde les données dans un fichier CSV
             with open(file_path, mode='w', newline='', encoding='utf-8') as file:
                 writer = csv.writer(file)
-                # Ajoute un en-tête des pour les colonnes
                 writer.writerow(["Colonne 1", "Colonne 2", "Colonne 3"])
-                # Écrit les données 
                 for row in self.val:
                     writer.writerow(row)
             print(f"Fichier CSV sauvegardé sous {file_path}")
-
 
     def open_main_window(self):
         from main_window import MainWindow
